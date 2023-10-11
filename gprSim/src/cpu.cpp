@@ -15,19 +15,33 @@
 #include "bit_operations.hpp"
 #include <iostream>
 
+int CycleTable[10][5] = 
+{
+    {2,1,2,0,1},
+    {2,0,2,0,0},
+    {2,1,2,0,0},
+    {2,1,2,0,0},
+    {2,1,2,0,0},
+    {2,0,2,0,2},
+    {2,1,2,0,1},
+    {2,0,0,0,1},
+    {2,1,2,0,1},
+    {2,1,2,2,1}
+};
+
 /* Constexpr bit streams of strings calculated at compile time to run efficiently and work nicely in switch statement */
-constexpr const char* ANSWER_SYMBOL                 =   "ANS";
-constexpr const char* LOAD_INSTRUCTION              =   "LOAD";
-constexpr const char* STO_INSTRUCTION               =   "STO";
-constexpr const char* ADD_INSTRUCTION               =   "ADD";
-constexpr const char* MULT_INSTRUCTION              =   "MUL";
-constexpr const char* END_INSTRUCTION               =   "END";
-constexpr int32_t ANSWER_BIT_STREAM                 =   computeBitStream(ANSWER_SYMBOL);        // Defined in helpers/bit_operations.hpp
-constexpr int32_t LOAD_INSTRUCTION_BIT_STREAM       =   computeBitStream(LOAD_INSTRUCTION);
-constexpr int32_t STO_INSTRUCTION_BIT_STREAM        =   computeBitStream(STO_INSTRUCTION);
-constexpr int32_t ADD_INSTRUCTION_BIT_STREAM        =   computeBitStream(ADD_INSTRUCTION);
-constexpr int32_t MULT_INSTRUCTION_BIT_STREAM       =   computeBitStream(MULT_INSTRUCTION);
-constexpr int32_t END_INSTRUCTION_BIT_STREAM        =   computeBitStream(END_INSTRUCTION);
+constexpr const char*   ANSWER_SYMBOL                       =   "ANS";
+constexpr const char*   LOAD_INSTRUCTION                    =   "LOAD";
+constexpr const char*   STO_INSTRUCTION                     =   "STO";
+constexpr const char*   ADD_INSTRUCTION                     =   "ADD";
+constexpr const char*   MULT_INSTRUCTION                    =   "MUL";
+constexpr const char*   END_INSTRUCTION                     =   "END";
+constexpr const int32_t ANSWER_BIT_STREAM                   =   computeBitStream(ANSWER_SYMBOL);        // Defined in helpers/bit_operations.hpp
+constexpr const int32_t LOAD_INSTRUCTION_BIT_STREAM         =   computeBitStream(LOAD_INSTRUCTION);
+constexpr const int32_t STO_INSTRUCTION_BIT_STREAM          =   computeBitStream(STO_INSTRUCTION);
+constexpr const int32_t ADD_INSTRUCTION_BIT_STREAM          =   computeBitStream(ADD_INSTRUCTION);
+constexpr const int32_t MULT_INSTRUCTION_BIT_STREAM         =   computeBitStream(MULT_INSTRUCTION);
+constexpr const int32_t END_INSTRUCTION_BIT_STREAM          =   computeBitStream(END_INSTRUCTION);
 
 /* Called in loop from main to run program */
 void executeInstruction(MIPSCPU& cpu) 

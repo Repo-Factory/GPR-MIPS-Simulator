@@ -1,8 +1,10 @@
-#pragma once
+#ifndef CPU_H
+#define CPU_H
 
 #include "stdio.h"
 #include "stdlib.h"
 #include "memory.hpp"
+#include "parser.hpp"
 
 struct MIPSCPU // CPU has memory and registers (in this case accumulator & program counter) 
 {
@@ -65,35 +67,8 @@ enum class FunctionalUnits
     RegisterFileWrite               = 5
 };
 
-enum class Instructions
-{
-    ADDI                            = 0,
-    B                               = 1,
-    BEQZ                            = 2,
-    BGE                             = 3,
-    BNE                             = 4,
-    LA                              = 5,
-    LB                              = 6,
-    LI                              = 7,
-    SUBI                            = 8,
-    SYSCALL                         = 9
-};
 
-int CycleTable[10][5] = 
-{
-    {2,1,2,0,1},
-    {2,0,2,0,0},
-    {2,1,2,0,0},
-    {2,1,2,0,0},
-    {2,1,2,0,0},
-    {2,0,2,0,2},
-    {2,1,2,0,1},
-    {2,0,0,0,1},
-    {2,1,2,0,1},
-    {2,1,2,2,1}
-};
-
-
+#endif
 
 /* ADDI Rdest, Rsrc1, Imm
 B label

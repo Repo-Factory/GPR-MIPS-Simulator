@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(accumulator)
+project(gpr)
 
 get_filename_component(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}" DIRECTORY)
 set(CMAKE_CXX_STANDARD 20)
@@ -11,27 +11,27 @@ endif()
 
 # Add package's source files
 add_executable(
-    accumulator 
-    ${SRC_DIR}/accumulator/src/cpu.cpp
-    ${SRC_DIR}/accumulator/src/loader.cpp
-    ${SRC_DIR}/accumulator/src/memory.cpp
-    ${SRC_DIR}/accumulator/src/main.cpp
+    gpr 
+    src/cpu.cpp
+    src/loader.cpp
+    src/memory.cpp
+    src/main.cpp
 )
 
 target_include_directories(
-    accumulator PUBLIC 
-    ${SRC_DIR}/accumulator/include
+    gpr PUBLIC 
+    include
 )
 
-add_definitions(-DASSEMBLY_PATH="${SRC_DIR}/quadratic_accumulator.s")
+add_definitions(-DASSEMBLY_PATH="${SRC_DIR}/quadratic_gpr.s")
 
 # Link to helpers code
-target_link_libraries(accumulator
+target_link_libraries(gpr
   helpers
 )
 
 # Install the executable
-install(TARGETS accumulator
+install(TARGETS gpr
   DESTINATION lib/${PROJECT_NAME}
 )
 

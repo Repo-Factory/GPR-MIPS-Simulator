@@ -21,13 +21,13 @@ std::string int32ToAscii(int32_t intValue)
     return ascii;
 }
 
-void debugPrint(Memory& memory)
-{
-    for (int i = 0; i < 256; ++i) {
-        std::cout << "Memory[" << i << "]: " << int32ToAscii(*((int32_t*)&memory + i)) << std::endl;
-    }
-    for (int i = 0; i < 256; ++i) {
-        std::cout << "Memory[" << i << "]: " <<  *((int32_t*)&memory + i) << std::endl;
-    }
-    std::cout << memory.symbol_table;
-}
+// void debugPrint(Memory& memory)
+// {
+//     for (int i = 0; i < 256; ++i) {
+//         std::cout << "Memory[" << i << "]: " << int32ToAscii(*((int32_t*)&memory + i)) << std::endl;
+//     }
+//     for (int i = 0; i < 256; ++i) {
+//         std::cout << "Memory[" << i << "]: " <<  *((int32_t*)&memory + i) << std::endl;
+//     }
+//     std::cout << memory.symbol_table;
+// }
