@@ -12,6 +12,7 @@ endif()
 # Add package's source files
 add_executable(
     gpr 
+    src/parser.cpp
     src/cpu.cpp
     src/loader.cpp
     src/memory.cpp

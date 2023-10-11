@@ -19,15 +19,13 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "bit_operations.hpp"
+#include "file_handling_helpers.hpp"
 
 constexpr const int INSTRUCTION_LENGTH_BITS = 32;
 constexpr const int OPCODE_LENGTH_BITS = 6;
 constexpr const int REGISTER_LENGTH = 5;
 constexpr const int IMMEDIATE_LENGTH = 16;
 constexpr const int ALL_ZEROES = 0;
-
-
-
 
 // OPCODE 6 bits | $Register 5 bits | Label - 32-USED bits | Imm - 16 bits
 
@@ -59,6 +57,13 @@ constexpr const int32_t SUBI_INSTRUCTION_BIT_STREAM             =   computeBitSt
 int32_t Parser::parseInstruction(const std::string& next_instruction)
 {
     int current_bit = INSTRUCTION_LENGTH_BITS; // If we have 32 bits to fill, we start from the 32nd leftmost bit
-    int32_t current_instruction =  
+    iterateTokens(next_instruction, [&](const std::string& token) {
+             
+    });
 }
-// Does something
+
+bool Parser::isInstruction(const std::string& instruction)
+{
+    return countWords(instruction) > 1;    
+}
+

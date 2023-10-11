@@ -75,30 +75,30 @@ void executeInstruction(MIPSCPU& cpu)
 /* Read contents of the succeeding symbol and place them into accumulator */
 void load(MIPSCPU& cpu) 
 {
-    writeContents(cpu.accumulator, readContents(cpu.memory.symbol_table[readContents(++cpu.pc)]));
+    // writeContents(cpu.accumulator, readContents(cpu.memory.symbol_table[readContents(++cpu.pc)]));
 }
 
 /* Into the contents of the succeeding symbol, write the contents of the accumulator */
 void store(MIPSCPU& cpu) 
 {
-    writeContents(cpu.memory.symbol_table[readContents(++cpu.pc)], *cpu.accumulator);
+    // writeContents(cpu.memory.symbol_table[readContents(++cpu.pc)], *cpu.accumulator);
 }
 
 /* Get the contents of the succeeding symbol and the accumulator, add them together, write answer into accumulator  */
 void add(MIPSCPU& cpu) 
 {
-    writeContents(cpu.accumulator, readContents(cpu.accumulator) + readContents(cpu.memory.symbol_table[readContents(++cpu.pc)]));
+    // writeContents(cpu.accumulator, readContents(cpu.accumulator) + readContents(cpu.memory.symbol_table[readContents(++cpu.pc)]));
 }
 
 /* Get the contents of the succeeding symbol and the accumulator, multiply them together, write answer into accumulator  */
 void mult(MIPSCPU& cpu) 
 {
-    writeContents(cpu.accumulator, readContents(cpu.accumulator) * readContents(cpu.memory.symbol_table[readContents(++cpu.pc)]));
+    // writeContents(cpu.accumulator, readContents(cpu.accumulator) * readContents(cpu.memory.symbol_table[readContents(++cpu.pc)]));
 }
 
 /* Switch user mode to false to exit instruction loop */
 void end(MIPSCPU& cpu) 
 {
-    std::cout << "Quadratic Evaluation of Given Operands is " << readContents(cpu.memory.symbol_table[ANSWER_BIT_STREAM]) << "\n";
+    // std::cout << "Quadratic Evaluation of Given Operands is " << readContents(cpu.memory.symbol_table[ANSWER_BIT_STREAM]) << "\n";
     cpu.userMode = false;
 }

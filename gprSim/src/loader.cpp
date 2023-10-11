@@ -10,23 +10,47 @@
 #include "debug_helpers.hpp"
 #include "bit_operations.hpp"
 #include "file_handling_helpers.hpp"
-#include <regex>
+#include "parser.hpp"
+#include <functional>
 
-#define LABEL_REGEX_PATTERN "([A-Za-z][A-Za-z]*:)"
-#define INT_REGEX_PATTERN "[0-9]*"
 #define DATA_SECTION_IDENTIFIER ".data"
 #define TEXT_SECTION_IDENTIFIER ".text"
-#define COMMENT_IDENTIFIER '#'
+#define LABEL_IDENTIFIER        ':'
+#define COMMENT_IDENTIFIER      '#'
+#define WHITE_SPACE_IDENTIFIER  ' '
+#define FIRST_CHAR(line) line[0]
+#define REMOVE_LAST_CHAR(string) string.substr(0, string.size()-1)
+#define INCREMENT(ptr) ptr+=1
 
 namespace // Keep private implementation out of Public API with anonymous namespace
 {
     /* Reads through file, skips commented lines and loads other words into memory  */
-    void iterateFile(Loader* loader, Memory& memory, std::ifstream& sourceCode)
+    void iterateFile(std::ifstream& sourceCode, std::function<void(const std::string&)> performAction)
     {
-        while (!sourceCode.eof()) {
-            if (sourceCode.peek() == COMMENT_IDENTIFIER) 
-                getLine(sourceCode); // skip line
-            else loader->loadToMemory(memory, getWord(sourceCode));
+        while (!sourceCode.eof()) 
+        {
+            const std::string line = getLine(sourceCode);
+            if (line.find_first_not_of(WHITE_SPACE_IDENTIFIER) == std::string::npos) continue; // Skip empty lines
+            if (FIRST_CHAR(line) == COMMENT_IDENTIFIER)                              continue; // Skip commented lines
+            performAction(line);
+        }
+    }
+}
+
+namespace // Line Handling Helpers
+{
+    void updateMemorySectionIfNecessary(int32_t* LOCCTR, Memory& memory, const std::string& line)
+    {
+        const std::string firstWord = getFirstWordOfLine(line);
+        if      (firstWord == DATA_SECTION_IDENTIFIER)   LOCCTR = memory.userDataPtr;
+        else if (firstWord == TEXT_SECTION_IDENTIFIER)   LOCCTR = memory.userTextPtr;
+    }
+
+    void addSymbolTableEntryIfNecessary(int32_t* LOCCTR, Memory& memory, const std::string& line)
+    {
+        const std::string firstWord = getFirstWordOfLine(line);
+        if (firstWord.back() == LABEL_IDENTIFIER) {
+            memory.symbol_table.insert({REMOVE_LAST_CHAR(firstWord), LOCCTR});
         }
     }
 }
@@ -37,21 +61,25 @@ namespace // Keep private implementation out of Public API with anonymous namesp
  * Encountering an integer will cause us to load that value into the current memory address
  * Otherwise, we have an instruction to convert to a bit stream and place into the current memory address
  */
-void Loader::loadToMemory(Memory& memory, const std::string& word)
+void Loader::performFirstPass(Memory& memory, std::ifstream& sourceCode)
 { 
-    if (word == DATA_SECTION_IDENTIFIER)
-        this->currentAddressPtr = memory.userDataPtr;
+    iterateFile(sourceCode, [&](const std::string& line) {
+        updateMemorySectionIfNecessary(this->LOCCTR, memory, line);
+        addSymbolTableEntryIfNecessary(this->LOCCTR, memory, line);
+        if (Parser::isInstruction(line)) {
+            INCREMENT(this->LOCCTR);
+        }
+    });
+}
 
-    else if (word == TEXT_SECTION_IDENTIFIER) 
-        this->currentAddressPtr = memory.userTextPtr;
-
-    else if (std::regex_match(word, std::regex(LABEL_REGEX_PATTERN)))
-        memory.symbol_table.insert({labelToBitStream(word), this->currentAddressPtr});
-
-    else if (std::regex_match(word, std::regex(INT_REGEX_PATTERN)))
-        writeContents(this->currentAddressPtr++, std::stoi(word));
-
-    else writeContents(this->currentAddressPtr++, stringToBitStream(word));
+void Loader::performSecondPass(Memory& memory, std::ifstream& sourceCode)
+{ 
+    iterateFile(sourceCode, [&](const std::string& line) {
+        updateMemorySectionIfNecessary(this->LOCCTR, memory, line);
+        if (Parser::isInstruction(line)) {
+            writeContents(this->LOCCTR++, Parser::parseInstruction(line));
+        }
+    });
 }
 
 /* Simple entry point to load program which will open the program, iterate through it, and close it */
@@ -59,10 +87,10 @@ void Loader::loadProgram(Memory& memory, char* assemblyPath)
 {
     std::ifstream sourceCode(assemblyPath);
     handleFileError(sourceCode, assemblyPath);
-    iterateFile(this, memory, sourceCode);
+    this->performFirstPass(memory, sourceCode);
+    this->performSecondPass(memory, sourceCode);
     #ifdef DEBUG
         debugPrint(memory);
     #endif
     sourceCode.close();
-}  
- 
+}
