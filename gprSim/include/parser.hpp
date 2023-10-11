@@ -3,24 +3,17 @@
 
 #include <cstdint>
 #include <string>
+#include "memory.hpp"
 
-enum class Instructions
+struct BitStream
 {
-    ADDI                            = 0,
-    B                               = 1,
-    BEQZ                            = 2,
-    BGE                             = 3,
-    BNE                             = 4,
-    LA                              = 5,
-    LB                              = 6,
-    LI                              = 7,
-    SUBI                            = 8,
-    SYSCALL                         = 9
+    int32_t stream;
+    int32_t size;
 };
 
 namespace Parser
 {
-    int32_t parseInstruction(const std::string& next_instruction);
+    int32_t parseInstruction(const std::string& next_instruction, const Memory& memory);
     bool    isInstruction(const std::string& instruction);
 }
 

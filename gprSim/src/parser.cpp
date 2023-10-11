@@ -15,55 +15,87 @@
  * SYSCALL
  */
 
-#include "parser.hpp"
 #include "stdio.h"
 #include "stdlib.h"
+#include "parser.hpp"
+#include "encoder.hpp"
 #include "bit_operations.hpp"
 #include "file_handling_helpers.hpp"
 
-constexpr const int INSTRUCTION_LENGTH_BITS = 32;
-constexpr const int OPCODE_LENGTH_BITS = 6;
-constexpr const int REGISTER_LENGTH = 5;
-constexpr const int IMMEDIATE_LENGTH = 16;
-constexpr const int ALL_ZEROES = 0;
+// Lengths in bits
+constexpr const int INSTRUCTION_LENGTH                          = 32;
+constexpr const int OPCODE_LENGTH                               = 6;
+constexpr const int REGISTER_LENGTH                             = 5;
+constexpr const int IMMEDIATE_LENGTH                            = 16;
+constexpr const int OFFSET_LENGTH                               = 21;
+constexpr const int LABEL_LENGTH                                = 16;
+constexpr const int ALL_ZEROES                                  = 0;
 
-// OPCODE 6 bits | $Register 5 bits | Label - 32-USED bits | Imm - 16 bits
-
-constexpr const char*   ANSWER_SYMBOL                           =   "ANS";
-constexpr const char*   ADDI_INSTRUCTION                        =   "ADDI";
-constexpr const char*   B_INSTRUCTION                           =   "B";
-constexpr const char*   BEQZ_INSTRUCTION                        =   "BEQZ";
-constexpr const char*   BGE_INSTRUCTION                         =   "MUL";
-constexpr const char*   BNE_INSTRUCTION                         =   "BNE";
-constexpr const char*   LA_INSTRUCTION                          =   "LA";
-constexpr const char*   LB_INSTRUCTION                          =   "LB";
-constexpr const char*   LI_INSTRUCTION                          =   "LI";
-constexpr const char*   SUBI_INSTRUCTION                        =   "SUBI";
-constexpr const char*   SYSCALL_INSTRUCTION                     =   "SYSCALL";
-
-constexpr const int32_t ANSWER_BIT_STREAM                       =   computeBitStream(ANSWER_SYMBOL);        // Defined in helpers/bit_operations.hpp
-constexpr const int32_t ADDI_INSTRUCTION_BIT_STREAM             =   computeBitStream(ADDI_INSTRUCTION);
-constexpr const int32_t B_INSTRUCTION_BIT_STREAM                =   computeBitStream(B_INSTRUCTION);
-constexpr const int32_t BEQZ_INSTRUCTION_BIT_STREAM             =   computeBitStream(BEQZ_INSTRUCTION);
-constexpr const int32_t BGE_INSTRUCTION_BIT_STREAM              =   computeBitStream(BGE_INSTRUCTION);
-constexpr const int32_t BNE_INSTRUCTION_BIT_STREAM              =   computeBitStream(BNE_INSTRUCTION);
-constexpr const int32_t LA_INSTRUCTION_BIT_STREAM               =   computeBitStream(LA_INSTRUCTION);
-constexpr const int32_t LB_INSTRUCTION_BIT_STREAM               =   computeBitStream(LB_INSTRUCTION);
-constexpr const int32_t LI_INSTRUCTION_BIT_STREAM               =   computeBitStream(LI_INSTRUCTION);
-constexpr const int32_t SUBI_INSTRUCTION_BIT_STREAM             =   computeBitStream(SUBI_INSTRUCTION);
-// constexpr const int32_t SYSCALL_INSTRUCTION_BIT_STREAM          =   computeBitStream(SYSCALL_INSTRUCTION);
-
-
-int32_t Parser::parseInstruction(const std::string& next_instruction)
+namespace
 {
-    int current_bit = INSTRUCTION_LENGTH_BITS; // If we have 32 bits to fill, we start from the 32nd leftmost bit
-    iterateTokens(next_instruction, [&](const std::string& token) {
-             
-    });
+    constexpr const char REGISTER_IDENTIFIER = '$';
+    constexpr const char OFFSET_IDENTIFIER =   ')';
+
+    bool is_opcode(const std::string& token)
+    {
+        return opcodeTable.find(token.c_str()) != opcodeTable.end();
+    }
+
+    bool is_register(const std::string& token)
+    {
+        return token.front()==REGISTER_IDENTIFIER;
+    }
+
+    bool is_offset(const std::string& token)
+    {
+        return token.back()==OFFSET_IDENTIFIER;
+    }
+
+    bool is_immediate(const std::string& str) 
+    {
+        if (str.empty()) return false;
+        for (char c : str) {
+            if (!std::isdigit(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
 
+namespace
+{
+    // Pass in memory for the symbol table
+    BitStream getBitStreamFromToken(const std::string& token, const Memory& memory)
+    {
+        if (is_opcode(token)) 
+            return BitStream{OPCODE_LENGTH, Encoder::encodeOpCode(token)};
+        if (is_register(token)) 
+            return BitStream{REGISTER_LENGTH, Encoder::encodeRegister(token)};
+        if (is_immediate(token)) 
+            return BitStream{IMMEDIATE_LENGTH, Encoder::encodeImmediate(token)};
+        if (is_offset(token))
+            return BitStream{OFFSET_LENGTH, Encoder::encodeOffset(token)};
+        else 
+            return BitStream{LABEL_LENGTH, Encoder::encodeLabel(token, memory)};
+    }
+}
+
+int32_t Parser::parseInstruction(const std::string& next_instruction, const Memory& memory)
+{
+    int current_bit = INSTRUCTION_LENGTH;     ; // If we have 32 bits to fill, we start from the 32nd leftmost bit
+    int32_t instruction = ALL_ZEROES;
+    iterateTokens(next_instruction, [&](const std::string& token) {
+        const BitStream bit_stream = getBitStreamFromToken(token, memory);
+        instruction |= (bit_stream.stream << current_bit-bit_stream.size);
+    });
+    return instruction;
+}
+
+// Checks if label or instruction
+constexpr const int MIN_NUMBER_OF_SYMBOLS_IN_INSTRUCTION = 1;
 bool Parser::isInstruction(const std::string& instruction)
 {
-    return countWords(instruction) > 1;    
+    return countWords(instruction) > MIN_NUMBER_OF_SYMBOLS_IN_INSTRUCTION;    
 }
 

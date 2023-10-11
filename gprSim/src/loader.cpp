@@ -25,19 +25,18 @@
 namespace // Keep private implementation out of Public API with anonymous namespace
 {
     /* Reads through file, skips commented lines and loads other words into memory  */
-    void iterateFile(std::ifstream& sourceCode, std::function<void(const std::string&)> performAction)
+    void iterateFile(std::ifstream& sourceCode, std::function<void(const std::string&)> performActionOnLine)
     {
-        while (!sourceCode.eof()) 
-        {
+        while (!sourceCode.eof()) {
             const std::string line = getLine(sourceCode);
             if (line.find_first_not_of(WHITE_SPACE_IDENTIFIER) == std::string::npos) continue; // Skip empty lines
             if (FIRST_CHAR(line) == COMMENT_IDENTIFIER)                              continue; // Skip commented lines
-            performAction(line);
+            performActionOnLine(line);
         }
     }
 }
 
-namespace // Line Handling Helpers
+namespace // First Pass Line Handling Helpers
 {
     void updateMemorySectionIfNecessary(int32_t* LOCCTR, Memory& memory, const std::string& line)
     {
@@ -53,31 +52,34 @@ namespace // Line Handling Helpers
             memory.symbol_table.insert({REMOVE_LAST_CHAR(firstWord), LOCCTR});
         }
     }
+
+    void incrementLocationCounterIfNecessary(int32_t* LOCCTR, const std::string& line)
+    {
+        if (Parser::isInstruction(line)) INCREMENT(LOCCTR);
+    }
 }
 
 /* 
- * Handles the current word. If it corresponds with a section, we change where the loader points to in memory
- * We use regex to identify labels, which will prompt us to store the label in our symbol table
- * Encountering an integer will cause us to load that value into the current memory address
- * Otherwise, we have an instruction to convert to a bit stream and place into the current memory address
+ * Create Symbol Table
  */
 void Loader::performFirstPass(Memory& memory, std::ifstream& sourceCode)
 { 
     iterateFile(sourceCode, [&](const std::string& line) {
         updateMemorySectionIfNecessary(this->LOCCTR, memory, line);
         addSymbolTableEntryIfNecessary(this->LOCCTR, memory, line);
-        if (Parser::isInstruction(line)) {
-            INCREMENT(this->LOCCTR);
-        }
+        incrementLocationCounterIfNecessary(this->LOCCTR, line);
     });
 }
 
+/* 
+ * Convert instructions to 32-bit streams and load them into memory
+ */
 void Loader::performSecondPass(Memory& memory, std::ifstream& sourceCode)
 { 
     iterateFile(sourceCode, [&](const std::string& line) {
         updateMemorySectionIfNecessary(this->LOCCTR, memory, line);
         if (Parser::isInstruction(line)) {
-            writeContents(this->LOCCTR++, Parser::parseInstruction(line));
+            writeContents(this->LOCCTR++, Parser::parseInstruction(line, memory));
         }
     });
 }

@@ -25,6 +25,7 @@ target_include_directories(
 )
 
 add_definitions(-DASSEMBLY_PATH="${SRC_DIR}/quadratic_gpr.s")
+# add_definitions(-DDEBUG)
 
 # Link to helpers code
 target_link_libraries(gpr

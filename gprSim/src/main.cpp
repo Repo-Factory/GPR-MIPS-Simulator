@@ -26,7 +26,7 @@
 #define OUTPUT_MESSAGE "Instructions Executed: %d\nTotal Cycles: %d\nSpeed Up: %f"
 
 #ifndef ASSEMBLY_PATH
-    #define ASSEMBLY_PATH "quadratic_accumulator.s"             // Default path
+    constexpr char* ASSEMBLY_PATH = "quadratic_accumulator.s";             // Default path
 #endif
 
 /* Load instructions into memory and execute instructions forever (will stop when END command reached) */
