@@ -21,6 +21,7 @@
 #include "encoder.hpp"
 #include "bit_operations.hpp"
 #include "file_handling_helpers.hpp"
+#include "instructions.hpp"
 
 // Lengths in bits
 constexpr const int INSTRUCTION_LENGTH                          = 32;
@@ -38,7 +39,7 @@ namespace
 
     bool is_opcode(const std::string& token)
     {
-        return opcodeTable.find(token.c_str()) != opcodeTable.end();
+        return OpcodeTable::searchTable(token);
     }
 
     bool is_register(const std::string& token)
@@ -98,4 +99,3 @@ bool Parser::isInstruction(const std::string& instruction)
 {
     return countWords(instruction) > MIN_NUMBER_OF_SYMBOLS_IN_INSTRUCTION;    
 }
-

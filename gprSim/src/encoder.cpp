@@ -7,6 +7,7 @@
  */
 
 #include "encoder.hpp"
+#include "instructions.hpp"
 
 constexpr const int NO_OFFSET           = 0;
 constexpr const int REGISTER_LENGTH     = 5;
@@ -48,7 +49,7 @@ constexpr const int IGNORE_FIRST_CHAR = 1;
 
 int32_t Encoder::encodeOpCode(const std::string& token)
 {
-    return opcodeTable[token.c_str()];
+    return OpcodeTable::getOpcode(token);
 }
 
 int32_t Encoder::encodeRegister(const std::string& token)

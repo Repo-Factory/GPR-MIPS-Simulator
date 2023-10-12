@@ -1,6 +1,8 @@
 #ifndef INSTRUCTIONS_H
 #define INSTRUCTIONS_H
 
+#include <string>
+
 enum class Identifier               // OpCode Mappings
 {
     ADDI                            = 0,
@@ -14,5 +16,11 @@ enum class Identifier               // OpCode Mappings
     SUBI                            = 8,
     SYSCALL                         = 9
 };
+
+namespace OpcodeTable
+{
+    bool searchTable(const std::string& token);
+    int32_t getOpcode(const std::string& token);
+}
 
 #endif
