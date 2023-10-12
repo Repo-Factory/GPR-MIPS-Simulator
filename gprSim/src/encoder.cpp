@@ -74,5 +74,6 @@ int32_t Encoder::encodeLabel(const std::string& token, Memory& memory)
 {
     char* label_address = (char*)memory.symbol_table[token];
     char* memory_start_address = (char*)&memory;
+    std::cout << "addr: " << static_cast<int32_t>(label_address-memory_start_address) << std::endl;
     return static_cast<int32_t>(label_address-memory_start_address);
 }
