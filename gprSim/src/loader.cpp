@@ -36,8 +36,37 @@ namespace // Keep private implementation out of Public API with anonymous namesp
     }
 }
 
+
+namespace
+{
+    void* allocateDataEntry(const std::string& line)
+    {
+        std::istringstream tokens(line);
+        std::string word;
+        tokens >> word;         // Skip first  which is the label
+        tokens >> word;         // Check the second word for type
+        if (word=="#") {
+            return NULL;
+        }
+        if (word=="\".asciiz\"") {
+            std::string data;
+            std::getline(tokens >> std::ws, data);
+            std::string* entry = new std::string();      // Allocate a byte for each character of string
+            *entry = data;
+            return (void*)entry;
+        }
+        if (word == "\".space\"") {
+            tokens >> word;
+            return (void*)malloc(std::stoi(word) * sizeof(char));   // Allocate number of bytes indicated
+        }
+        printf("%s is Not a Valid Data Section Identifier", word.c_str());
+        exit(EXIT_FAILURE);
+    }
+}
+
 namespace // First Pass Line Handling Helpers
 {
+    constexpr const int JUST_LABEL = 1;
     int32_t* updateMemorySectionIfNecessary(int32_t* LOCCTR, Memory& memory, const std::string& line)
     {
         const std::string firstWord = getFirstWordOfLine(line);
@@ -46,12 +75,24 @@ namespace // First Pass Line Handling Helpers
         else    return LOCCTR;
     }
 
-    void addSymbolTableEntryIfNecessary(int32_t* LOCCTR, Memory& memory, const std::string& line)
+    int32_t* addSymbolTableEntryIfNecessary(int32_t* LOCCTR, Memory& memory, const std::string& line)
     {
-        const std::string firstWord = getFirstWordOfLine(line);
+        std::string copy = line;
+        size_t pos = copy.find("#");
+        if (pos != std::string::npos) copy=copy.substr(0,pos);
+        const std::string firstWord = getFirstWordOfLine(copy);
         if (firstWord.back() == LABEL_IDENTIFIER) {
-            memory.symbol_table.insert({REMOVE_LAST_CHAR(firstWord), LOCCTR});
+            if (countWords(copy) == JUST_LABEL) {
+                memory.symbol_table.insert({REMOVE_LAST_CHAR(firstWord), (void*)LOCCTR});
+            }
+            else {
+                void* entry = allocateDataEntry(copy);
+                if (entry) {
+                    memory.symbol_table.insert({REMOVE_LAST_CHAR(firstWord), entry});
+                }
+            }
         }
+        return LOCCTR;
     }
 }
 
@@ -62,8 +103,10 @@ void Loader::performFirstPass(Memory& memory, std::ifstream& sourceCode)
 { 
     iterateFile(sourceCode, [&](const std::string& line) {
         this->LOCCTR = updateMemorySectionIfNecessary(this->LOCCTR, memory, line);
-        addSymbolTableEntryIfNecessary(this->LOCCTR, memory, line);
-        if (Parser::isInstruction(line)) {INCREMENT(LOCCTR);};
+        this->LOCCTR = addSymbolTableEntryIfNecessary(this->LOCCTR, memory, line);
+        if (Parser::isInstruction(line)) {
+            INCREMENT(LOCCTR);
+        }
     });
 }
 

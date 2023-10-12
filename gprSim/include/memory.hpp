@@ -3,10 +3,10 @@
 #include <map>
 #include <string>
 
-#define USER_TEXT_SIZE 128
-#define KERNEL_TEXT_SIZE  64
-#define USER_DATA_SIZE 128
-#define KERNEL_DATA_SIZE 64
+#define USER_TEXT_SIZE 1024
+#define KERNEL_TEXT_SIZE  512
+#define USER_DATA_SIZE 1024
+#define KERNEL_DATA_SIZE 512
 
 using SymbolTable = std::map<std::string, void*>;
 
