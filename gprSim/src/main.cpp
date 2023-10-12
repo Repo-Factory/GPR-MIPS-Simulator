@@ -35,15 +35,15 @@ int main() {
     std::unique_ptr<MIPSCPU> cpu = std::make_unique<MIPSCPU>();
     loader->loadProgram(cpu->memory, ASSEMBLY_PATH);             // defined in CMakeLists.txt
 
-    int instructionsExecuted = 0;
-    int totalCycles = 0;
-    float speed_up = SPEED_UP(instructionsExecuted, totalCycles); 
+    // int instructionsExecuted = 0;
+    // int totalCycles = 0;
+    // float speed_up = SPEED_UP(instructionsExecuted, totalCycles); 
     
-    cpu->userMode = true;
-    while (cpu->userMode) 
-        executeInstruction(*cpu);                                // defined in cpu.cpp
+    // cpu->userMode = true;
+    // while (cpu->userMode) 
+    //     executeInstruction(*cpu);                                // defined in cpu.cpp
     
-    FILE* output = popen(OUTPUT_FILE, WRITE_MODE);
-    fprintf(output, OUTPUT_MESSAGE, instructionsExecuted, totalCycles, speed_up);
+    // FILE* output = popen(OUTPUT_FILE, WRITE_MODE);
+    // fprintf(output, OUTPUT_MESSAGE, instructionsExecuted, totalCycles, speed_up);
     exit(EXIT_SUCCESS);
 }

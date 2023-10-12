@@ -8,6 +8,7 @@
 
 #include "encoder.hpp"
 #include "instructions.hpp"
+#include <iostream>
 
 constexpr const int NO_OFFSET           = 0;
 constexpr const int REGISTER_LENGTH     = 5;
@@ -69,8 +70,9 @@ int32_t Encoder::encodeOffset(const std::string& token)
     return instruction;
 }
 
-int32_t Encoder::encodeLabel(const std::string& token, const Memory& memory)
+int32_t Encoder::encodeLabel(const std::string& token, Memory& memory)
 {
-    return *memory.symbol_table.at(token);
+    char* label_address = (char*)memory.symbol_table[token];
+    char* memory_start_address = (char*)&memory;
+    return static_cast<int32_t>(label_address-memory_start_address);
 }
-

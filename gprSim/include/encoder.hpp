@@ -23,7 +23,7 @@ namespace Encoder
     int32_t encodeRegister(const std::string& token);
     int32_t encodeImmediate(const std::string& token);
     int32_t encodeOffset(const std::string& token);
-    int32_t encodeLabel(const std::string& token, const Memory& memory);
+    int32_t encodeLabel(const std::string& token, Memory& memory);
 }
 
 #endif

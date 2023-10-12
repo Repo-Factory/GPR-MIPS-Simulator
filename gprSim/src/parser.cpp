@@ -19,9 +19,11 @@
 #include "stdlib.h"
 #include "parser.hpp"
 #include "encoder.hpp"
+#include "debug_helpers.hpp"
 #include "bit_operations.hpp"
 #include "file_handling_helpers.hpp"
 #include "instructions.hpp"
+#include <iostream>
 
 // Lengths in bits
 constexpr const int INSTRUCTION_LENGTH                          = 32;
@@ -63,40 +65,40 @@ namespace
         return true;
     }
 }
-#include <iostream>
 
 namespace
 {
     // Pass in memory for the symbol table
-    BitStream getBitStreamFromToken(const std::string& token, const Memory& memory)
+    BitStream getBitStreamFromToken(const std::string& token, Memory& memory)
     {
         if (is_opcode(token)) 
             return BitStream{OPCODE_LENGTH, Encoder::encodeOpCode(token)};
         if (is_register(token)) 
-            return BitStream{REGISTER_LENGTH, Encoder::encodeRegister(token)};
+            return BitStream{REGISTER_LENGTH, Encoder::encodeRegister(token.substr(0,token.size()-1))};
         if (is_offset(token))
             return BitStream{OFFSET_LENGTH, Encoder::encodeOffset(token)};
         if (is_immediate(token)) 
             return BitStream{IMMEDIATE_LENGTH, Encoder::encodeImmediate(token)};
-        // else 
-        //     return BitStream{LABEL_LENGTH, Encoder::encodeLabel(token, memory)};
+        else 
+            return BitStream{LABEL_LENGTH, Encoder::encodeLabel(token, memory)};
     }
 }
-int32_t Parser::parseInstruction(const std::string& next_instruction, const Memory& memory)
+int32_t Parser::parseInstruction(const std::string& next_instruction, Memory& memory)
 {
     int current_bit = INSTRUCTION_LENGTH;     ; // If we have 32 bits to fill, we start from the 32nd leftmost bit
     int32_t instruction = ALL_ZEROES;
+    std::cout << next_instruction << std::endl;
     iterateTokens(next_instruction, [&](const std::string& token) {
         const BitStream bit_stream = getBitStreamFromToken(token, memory);
-        instruction |= (bit_stream.stream << current_bit-bit_stream.size);
-        std::cout << instruction << std::endl;
+        printBinary(bit_stream.stream);
+        instruction |= (bit_stream.stream << (current_bit -= bit_stream.size));
     });
     return instruction;
 }
 
 // Checks if label or instruction
-constexpr const int MIN_NUMBER_OF_SYMBOLS_IN_INSTRUCTION = 1;
 bool Parser::isInstruction(const std::string& instruction)
 {
-    return countWords(instruction) > MIN_NUMBER_OF_SYMBOLS_IN_INSTRUCTION;    
+    const std::string firstWord = getFirstWordOfLine(instruction);
+    return OpcodeTable::searchTable(firstWord);
 }

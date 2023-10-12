@@ -66,6 +66,7 @@ void Loader::performFirstPass(Memory& memory, std::ifstream& sourceCode)
         if (Parser::isInstruction(line)) {INCREMENT(LOCCTR);};
     });
 }
+
 /* 
  * Convert instructions to 32-bit streams and load them into memory
  */
@@ -82,10 +83,7 @@ void Loader::performSecondPass(Memory& memory, std::ifstream& sourceCode)
 void debugPrint(Memory& memory)
 {
     for (int i = 0; i < 256; ++i) {
-        std::cout << "Memory[" << i << "]: " << int32ToAscii(*((int32_t*)&memory + i)) << std::endl;
-    }
-    for (int i = 0; i < 256; ++i) {
-        std::cout << "Memory[" << i << "]: " <<  *((int32_t*)&memory + i) << std::endl;
+        std::cout << "Memory[" << i << "]: "; printBinary(*((int32_t*)&memory + i)); std::cout << std::endl;
     }
     std::cout << memory.symbol_table;
 }

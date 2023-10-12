@@ -61,7 +61,7 @@ is_palin:			# print the is_palin_msg, and exit.
 	b exit
 
 not_palin:
-	la $a0, not_palin_msg	## print the not_palin_msg, and exit.
+	la $a0, not_palin_msg	# print the not_palin_msg, and exit.
 	li $v0, 4
 	syscall
 	b exit
@@ -72,6 +72,6 @@ exit:				# exit the program
 
 
 	.data
-is_palin_msg: .asciiz "The string is a palindrome.\n"
-not_palin_msg: .asciiz "The string is not a palindrome.\n"
-string_space: .space 1024	# reserve 1024 bytes for the string.
+is_palin_msg: "The string is a palindrome.\n"
+not_palin_msg: "The string is not a palindrome.\n"
+string_space:  1024	# reserve 1024 bytes for the string.

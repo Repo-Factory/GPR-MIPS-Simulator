@@ -2,7 +2,7 @@
 
 #include "debug_helpers.hpp"
 
-std::ostream& operator<<(std::ostream& stream, std::map<std::string, int32_t*>& table)
+std::ostream& operator<<(std::ostream& stream, std::map<std::string, void*>& table)
 {
     for (const auto& [symbol, address] : table)
     {
@@ -21,3 +21,12 @@ std::string int32ToAscii(int32_t intValue)
     return ascii;
 }
 
+void printBinary(int32_t num) 
+{
+    for (int i = 32 - 1; i >= 0; --i) {
+        unsigned int mask = 1 << i;
+        std::cout << ((num & mask) ? '1' : '0');
+        if (i % 4 == 0) std::cout << ' ';
+    }
+    std::cout << std::endl;
+}
