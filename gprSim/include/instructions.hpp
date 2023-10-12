@@ -23,4 +23,10 @@ namespace OpcodeTable
     int32_t getOpcode(const std::string& token);
 }
 
+namespace RegisterTable
+{
+    bool searchTable(const std::string& token);
+    int32_t getRegister(const std::string& token);
+}
+
 #endif

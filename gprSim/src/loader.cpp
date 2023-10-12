@@ -38,11 +38,12 @@ namespace // Keep private implementation out of Public API with anonymous namesp
 
 namespace // First Pass Line Handling Helpers
 {
-    void updateMemorySectionIfNecessary(int32_t* LOCCTR, Memory& memory, const std::string& line)
+    int32_t* updateMemorySectionIfNecessary(int32_t* LOCCTR, Memory& memory, const std::string& line)
     {
         const std::string firstWord = getFirstWordOfLine(line);
-        if      (firstWord == DATA_SECTION_IDENTIFIER)   LOCCTR = memory.userDataPtr;
-        else if (firstWord == TEXT_SECTION_IDENTIFIER)   LOCCTR = memory.userTextPtr;
+        if      (firstWord == DATA_SECTION_IDENTIFIER)   return memory.userDataPtr;
+        else if (firstWord == TEXT_SECTION_IDENTIFIER)   return memory.userTextPtr;
+        else    return LOCCTR;
     }
 
     void addSymbolTableEntryIfNecessary(int32_t* LOCCTR, Memory& memory, const std::string& line)
@@ -52,11 +53,6 @@ namespace // First Pass Line Handling Helpers
             memory.symbol_table.insert({REMOVE_LAST_CHAR(firstWord), LOCCTR});
         }
     }
-
-    void incrementLocationCounterIfNecessary(int32_t* LOCCTR, const std::string& line)
-    {
-        if (Parser::isInstruction(line)) INCREMENT(LOCCTR);
-    }
 }
 
 /* 
@@ -65,34 +61,60 @@ namespace // First Pass Line Handling Helpers
 void Loader::performFirstPass(Memory& memory, std::ifstream& sourceCode)
 { 
     iterateFile(sourceCode, [&](const std::string& line) {
-        updateMemorySectionIfNecessary(this->LOCCTR, memory, line);
+        this->LOCCTR = updateMemorySectionIfNecessary(this->LOCCTR, memory, line);
         addSymbolTableEntryIfNecessary(this->LOCCTR, memory, line);
-        incrementLocationCounterIfNecessary(this->LOCCTR, line);
+        if (Parser::isInstruction(line)) {INCREMENT(LOCCTR);};
     });
 }
-
 /* 
  * Convert instructions to 32-bit streams and load them into memory
  */
 void Loader::performSecondPass(Memory& memory, std::ifstream& sourceCode)
 { 
     iterateFile(sourceCode, [&](const std::string& line) {
-        updateMemorySectionIfNecessary(this->LOCCTR, memory, line);
+        this->LOCCTR = updateMemorySectionIfNecessary(this->LOCCTR, memory, line);
         if (Parser::isInstruction(line)) {
             writeContents(this->LOCCTR++, Parser::parseInstruction(line, memory));
         }
     });
 }
 
+void debugPrint(Memory& memory)
+{
+    for (int i = 0; i < 256; ++i) {
+        std::cout << "Memory[" << i << "]: " << int32ToAscii(*((int32_t*)&memory + i)) << std::endl;
+    }
+    for (int i = 0; i < 256; ++i) {
+        std::cout << "Memory[" << i << "]: " <<  *((int32_t*)&memory + i) << std::endl;
+    }
+    std::cout << memory.symbol_table;
+}
+
+namespace
+{
+    void handleFirstPass(Loader* loader, Memory& memory, char* assemblyPath)
+    {
+        std::ifstream sourceCode = std::ifstream(assemblyPath);
+        handleFileError(sourceCode, assemblyPath);
+        loader->performFirstPass(memory, sourceCode);
+        sourceCode.close();
+    }
+
+    void handleSecondPass(Loader* loader, Memory& memory, char* assemblyPath)
+    {
+        std::ifstream sourceCode = std::ifstream(assemblyPath);
+        handleFileError(sourceCode, assemblyPath);
+        loader->performSecondPass(memory, sourceCode);
+        sourceCode.close();
+    }
+}
+
 /* Simple entry point to load program which will open the program, iterate through it, and close it */
 void Loader::loadProgram(Memory& memory, char* assemblyPath)
 {
-    std::ifstream sourceCode(assemblyPath);
-    handleFileError(sourceCode, assemblyPath);
-    this->performFirstPass(memory, sourceCode);
-    this->performSecondPass(memory, sourceCode);
+    handleFirstPass(this, memory, assemblyPath);
+    handleSecondPass(this, memory, assemblyPath);
     #ifdef DEBUG
         debugPrint(memory);
     #endif
-    sourceCode.close();
 }

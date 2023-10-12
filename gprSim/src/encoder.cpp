@@ -44,9 +44,7 @@ namespace // Offset Helpers
         return OffsetInstruction{integer_portion, Encoder::encodeRegister(register_portion)};
     }
 }
-
 constexpr const int IGNORE_FIRST_CHAR = 1;
-
 int32_t Encoder::encodeOpCode(const std::string& token)
 {
     return OpcodeTable::getOpcode(token);
@@ -54,7 +52,7 @@ int32_t Encoder::encodeOpCode(const std::string& token)
 
 int32_t Encoder::encodeRegister(const std::string& token)
 {
-    return std::stoi(token.substr(IGNORE_FIRST_CHAR));
+    return RegisterTable::getRegister(token);
 }
 
 int32_t Encoder::encodeImmediate(const std::string& token)

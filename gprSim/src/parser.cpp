@@ -63,6 +63,7 @@ namespace
         return true;
     }
 }
+#include <iostream>
 
 namespace
 {
@@ -73,15 +74,14 @@ namespace
             return BitStream{OPCODE_LENGTH, Encoder::encodeOpCode(token)};
         if (is_register(token)) 
             return BitStream{REGISTER_LENGTH, Encoder::encodeRegister(token)};
-        if (is_immediate(token)) 
-            return BitStream{IMMEDIATE_LENGTH, Encoder::encodeImmediate(token)};
         if (is_offset(token))
             return BitStream{OFFSET_LENGTH, Encoder::encodeOffset(token)};
-        else 
-            return BitStream{LABEL_LENGTH, Encoder::encodeLabel(token, memory)};
+        if (is_immediate(token)) 
+            return BitStream{IMMEDIATE_LENGTH, Encoder::encodeImmediate(token)};
+        // else 
+        //     return BitStream{LABEL_LENGTH, Encoder::encodeLabel(token, memory)};
     }
 }
-
 int32_t Parser::parseInstruction(const std::string& next_instruction, const Memory& memory)
 {
     int current_bit = INSTRUCTION_LENGTH;     ; // If we have 32 bits to fill, we start from the 32nd leftmost bit
@@ -89,6 +89,7 @@ int32_t Parser::parseInstruction(const std::string& next_instruction, const Memo
     iterateTokens(next_instruction, [&](const std::string& token) {
         const BitStream bit_stream = getBitStreamFromToken(token, memory);
         instruction |= (bit_stream.stream << current_bit-bit_stream.size);
+        std::cout << instruction << std::endl;
     });
     return instruction;
 }

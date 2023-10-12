@@ -9,13 +9,20 @@ if (NOT TARGET helpers)
     add_subdirectory(${SRC_DIR}/helpers ${CMAKE_BINARY_DIR}/helpers-build)
 endif()
 
+add_library(
+  gpr
+  STATIC
+  src/parser.cpp
+  src/encoder.cpp
+  src/instructions.cpp
+  src/cpu.cpp
+  src/loader.cpp
+  src/memory.cpp
+)
+
 # Add package's source files
 add_executable(
-    gpr 
-    src/parser.cpp
-    src/cpu.cpp
-    src/loader.cpp
-    src/memory.cpp
+    gpr_exec
     src/main.cpp
 )
 
@@ -24,16 +31,26 @@ target_include_directories(
     include
 )
 
-add_definitions(-DASSEMBLY_PATH="${SRC_DIR}/quadratic_gpr.s")
-# add_definitions(-DDEBUG)
+add_definitions(-DASSEMBLY_PATH="${SRC_DIR}/palindrome.s")
+add_definitions(-DDEBUG)
 
 # Link to helpers code
 target_link_libraries(gpr
   helpers
 )
 
-# Install the executable
-install(TARGETS gpr
-  DESTINATION lib/${PROJECT_NAME}
+target_link_libraries(gpr_exec
+  gpr
 )
 
+file(GLOB HEADERS include/*.hpp)
+install(FILES ${HEADERS} DESTINATION include/gpr)
+
+# Install the executable
+install(TARGETS gpr
+  DESTINATION lib
+)
+
+install(TARGETS gpr_exec
+  DESTINATION bin/${PROJECT_NAME}
+)
