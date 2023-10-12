@@ -24,13 +24,6 @@ std::string toUpper(const std::string& str)
     return copy;
 }
 
-std::string removeWhitespace(const std::string& str) 
-{
-    std::string copy = str;
-    copy.erase(std::remove_if(copy.begin(), copy.end(), ::isspace), copy.end());
-    return copy;
-}
-
 std::map<Name, Opcode> getOpcodeTable()
 {
     return std::map<Name, Opcode>

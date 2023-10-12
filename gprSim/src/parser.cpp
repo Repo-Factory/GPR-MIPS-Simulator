@@ -69,29 +69,31 @@ namespace
 namespace
 {
     // Pass in memory for the symbol table
-    BitStream getBitStreamFromToken(const std::string& token, Memory& memory)
+    BitStream getBitStreamFromToken(const int current_bit, const std::string& token, Memory& memory)
     {
         if (is_opcode(token)) 
             return BitStream{OPCODE_LENGTH, Encoder::encodeOpCode(token)};
         if (is_register(token)) 
             return BitStream{REGISTER_LENGTH, Encoder::encodeRegister(token.substr(0,token.size()-1))};
-        if (is_offset(token))
+        if (is_offset(token)) 
             return BitStream{OFFSET_LENGTH, Encoder::encodeOffset(token)};
         if (is_immediate(token)) 
-            return BitStream{IMMEDIATE_LENGTH, Encoder::encodeImmediate(token)};
+            return BitStream{current_bit, Encoder::encodeImmediate(token)};
         else 
-            return BitStream{LABEL_LENGTH, Encoder::encodeLabel(token, memory)};
+            return BitStream{current_bit, Encoder::encodeLabel(token, memory)};
     }
 }
+
 int32_t Parser::parseInstruction(const std::string& next_instruction, Memory& memory)
 {
     int current_bit = INSTRUCTION_LENGTH;     ; // If we have 32 bits to fill, we start from the 32nd leftmost bit
     int32_t instruction = ALL_ZEROES;
     std::cout << next_instruction << std::endl;
     iterateTokens(next_instruction, [&](const std::string& token) {
-        const BitStream bit_stream = getBitStreamFromToken(token, memory);
+        const BitStream bit_stream = getBitStreamFromToken(current_bit, token, memory);
         printBinary(bit_stream.stream);
-        instruction |= (bit_stream.stream << (current_bit -= bit_stream.size));
+        current_bit -= bit_stream.size;
+        instruction |= (bit_stream.stream << (current_bit));
     });
     return instruction;
 }

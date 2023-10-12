@@ -13,6 +13,7 @@
 constexpr const int NO_OFFSET           = 0;
 constexpr const int REGISTER_LENGTH     = 5;
 constexpr const int IMMEDIATE_LENGTH    = 16;
+constexpr const int OFFSET_LENGTH       = REGISTER_LENGTH + IMMEDIATE_LENGTH;
 constexpr const int ALL_ZEROES          = 0;
 
 
@@ -41,11 +42,11 @@ namespace // Offset Helpers
         if (offsetInfo.integer_portion_str.size() > 0) {
             integer_portion = std::stoi(offsetInfo.integer_portion_str);
         }
-        std::string register_portion = token.substr(offsetInfo.register_portion_index+1, token.size()-1); // ($t3) cut off parantheses
+        std::string register_portion = token.substr(offsetInfo.register_portion_index+1, token.size()-2); // ($t3) cut off parantheses
         return OffsetInstruction{integer_portion, Encoder::encodeRegister(register_portion)};
     }
 }
-constexpr const int IGNORE_FIRST_CHAR = 1;
+
 int32_t Encoder::encodeOpCode(const std::string& token)
 {
     return OpcodeTable::getOpcode(token);
@@ -65,8 +66,8 @@ int32_t Encoder::encodeOffset(const std::string& token)
 {
     int32_t instruction = ALL_ZEROES;
     const OffsetInstruction splitInstruction = splitOffsetInstruction(token);
-    instruction |= (splitInstruction.register_portion << REGISTER_LENGTH);
-    instruction |= (splitInstruction.integer_portion  << IMMEDIATE_LENGTH); 
+    instruction |= (splitInstruction.register_portion << OFFSET_LENGTH-REGISTER_LENGTH);
+    instruction |= (splitInstruction.integer_portion  << OFFSET_LENGTH-OFFSET_LENGTH); 
     return instruction;
 }
 
