@@ -1,3 +1,6 @@
+#ifndef BINARY_PARSER_H
+#define BINARY_PARSER_H
+
 #include "stdio.h"
 #include "stdlib.h"
 #include "instructions.hpp"
@@ -15,3 +18,5 @@ namespace BinaryParser
     LI_Instruction      PARSE_LI    (const int32_t instruction, MIPSCPU& cpu);
     SUBI_Instruction    PARSE_SUBI  (const int32_t instruction, MIPSCPU& cpu);
 }
+
+#endif

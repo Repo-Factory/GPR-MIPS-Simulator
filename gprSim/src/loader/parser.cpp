@@ -1,18 +1,18 @@
 /* 
- * @brief parser does something cool
+ * @brief Parse Source File Based on Instruction Specs
  *
- * Instruction Set 
- * ----------------------
- * ADDI Rdest, Rsrc1, Imm
- * B label
- * BEQZ Rsrc1, label
- * BGE Rsrc1, Rsrc2, label
- * BNE Rsrc1, Rsrc2, label
- * LA Rdest, label
- * LB Rdest, offset(Rsrc1)
- * LI Rdest, Imm
- * SUBI Rdest, Rsrc1, Imm
- * SYSCALL
+ *          Instruction Set 
+ *      ----------------------
+ *      ADDI Rdest, Rsrc1, Imm
+ *      B label
+ *      BEQZ Rsrc1, label
+ *      BGE Rsrc1, Rsrc2, label
+ *      BNE Rsrc1, Rsrc2, label
+ *      LA Rdest, label
+ *      LB Rdest, offset(Rsrc1)
+ *      LI Rdest, Imm
+ *      SUBI Rdest, Rsrc1, Imm
+ *      SYSCALL
  */
 
 #include "stdio.h"
@@ -32,7 +32,6 @@ constexpr const int OPCODE_LENGTH                               = 6;
 constexpr const int REGISTER_LENGTH                             = 5;
 constexpr const int IMMEDIATE_LENGTH                            = 16;
 constexpr const int OFFSET_LENGTH                               = 21;
-constexpr const int LABEL_LENGTH                                = 16;
 constexpr const int ALL_ZEROES                                  = 0;
 
 namespace

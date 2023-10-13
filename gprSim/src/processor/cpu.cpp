@@ -87,19 +87,19 @@ void executeInstruction(MIPSCPU& cpu)
 
 void ADDI(const int32_t instruction, MIPSCPU& cpu)
 {
-    const ADDI_Instruction addi_instruction = PARSE_ADDI(instruction, cpu);
+    const ADDI_Instruction addi_instruction = BinaryParser::PARSE_ADDI(instruction, cpu);
     *addi_instruction.Rdest = *addi_instruction.Rsrc1 + addi_instruction.Imm;
 }
 
 void B(const int32_t instruction, MIPSCPU& cpu)
 {
-    const B_Instruction b_instruction = PARSE_B(instruction, cpu);
+    const B_Instruction b_instruction = BinaryParser::PARSE_B(instruction, cpu);
     cpu.pc += b_instruction.label;
 }
 
 void BEQZ(const int32_t instruction, MIPSCPU& cpu)
 {
-    const BEQZ_Instruction beqz_instruction = PARSE_BEQZ(instruction, cpu);
+    const BEQZ_Instruction beqz_instruction = BinaryParser::PARSE_BEQZ(instruction, cpu);
     if (*beqz_instruction.Rsrc1 == 0) { 
         cpu.pc+=beqz_instruction.label;
     }
@@ -107,7 +107,7 @@ void BEQZ(const int32_t instruction, MIPSCPU& cpu)
 
 void BGE(const int32_t instruction, MIPSCPU& cpu)
 {
-    const BGE_Instruction bge_instruction = PARSE_BGE(instruction, cpu);
+    const BGE_Instruction bge_instruction = BinaryParser::PARSE_BGE(instruction, cpu);
     if (*bge_instruction.Rsrc1 >= *bge_instruction.Rsrc2) {
         cpu.pc+=bge_instruction.label;
     }
@@ -115,7 +115,7 @@ void BGE(const int32_t instruction, MIPSCPU& cpu)
 
 void BNE(const int32_t instruction, MIPSCPU& cpu)
 {
-    const BNE_Instruction bne_instruction = PARSE_BNE(instruction, cpu);
+    const BNE_Instruction bne_instruction = BinaryParser::PARSE_BNE(instruction, cpu);
     if (*bne_instruction.Rsrc1 != *bne_instruction.Rsrc2) {
         cpu.pc+=bne_instruction.label;
     }
@@ -123,27 +123,47 @@ void BNE(const int32_t instruction, MIPSCPU& cpu)
 
 void LA(const int32_t instruction, MIPSCPU& cpu)
 {
-    
-
-
+    const LA_Instruction la_instruction = BinaryParser::PARSE_LA(instruction, cpu);
+    *la_instruction.Rdest = la_instruction.label;
 }
 
 void LB(const int32_t instruction, MIPSCPU& cpu)
 {
-
+    const LB_Instruction lb_instruction = BinaryParser::PARSE_LB(instruction, cpu);
+    *lb_instruction.Rdest = *(lb_instruction.Rsrc1 + lb_instruction.offset);
 }
 
 void LI(const int32_t instruction, MIPSCPU& cpu)
 {
-
+    const LI_Instruction li_instruction = BinaryParser::PARSE_LI(instruction, cpu);
+    *li_instruction.Rdest = li_instruction.Imm;
 }
 
 void SUBI(const int32_t instruction, MIPSCPU& cpu)
 {
-
+    const SUBI_Instruction subi_instruction = BinaryParser::PARSE_SUBI(instruction, cpu);
+    *subi_instruction.Rdest = *subi_instruction.Rsrc1 - subi_instruction.Imm;
 }
+
 
 void SYSCALL(const int32_t instruction, MIPSCPU& cpu)
 {
+    // const int32_t* $v0 = cpu.registerMap[RegisterTable::getRegister("$v0")];
+    // const int32_t* $a0 = cpu.registerMap[RegisterTable::getRegister("$a0")];
+    // std::string input;
 
+    // if (*$v0 == 4) {
+    //     printf("Please Enter A String To Check If It Is A Palindrome");
+    //     std::cin >> input;
+    //     int32_t* ptr = (int32_t*)&cpu.memory+*$a0;
+    //     std::string* str_ptr = (std::string*)ptr;
+    //     *str_ptr = input;
+    // }
+    // if (*$v0 == 8) {
+    //     int32_t* ptr = (int32_t*)&cpu.memory+*$a0;
+    //     std::cout << *(std::string*)ptr << std::endl;
+    // }
+    // if (*$v0 == 10) {
+    //     exit(EXIT_SUCCESS);
+    // }
 }

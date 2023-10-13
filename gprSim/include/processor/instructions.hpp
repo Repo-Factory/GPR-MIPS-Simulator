@@ -129,7 +129,6 @@ constexpr int32_t SYSCALL_OPCODE()
 {
     return static_cast<int32_t>(Instruction::SYSCALL);
 }
-#endif
 
 namespace OpcodeTable
 {
@@ -142,3 +141,5 @@ namespace RegisterTable
     bool searchTable(const std::string& token);
     int32_t getRegister(const std::string& token);
 }
+
+#endif

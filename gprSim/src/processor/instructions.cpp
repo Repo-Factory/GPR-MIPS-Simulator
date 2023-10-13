@@ -13,7 +13,7 @@
 
 using Name = std::string;
 using Opcode = int32_t;
-using Register = int32_t;
+using Register_Id = int32_t;
 
 std::string toUpper(const std::string& str)
 {
@@ -55,9 +55,9 @@ Opcode OpcodeTable::getOpcode(const std::string& token)
     return opcodeTable[toUpper(token)]; 
 }
 
-std::map<Name, Register> getRegisterTable()
+std::map<Name, Register_Id> getRegisterTable()
 {
-    return std::map<Name, Register>
+    return std::map<Name, Register_Id>
     {
         {"$zero", 0},
         {"$at",   1},
@@ -93,15 +93,14 @@ std::map<Name, Register> getRegisterTable()
         {"$ra",   31},
     };
 }
-
 bool RegisterTable::searchTable(const std::string& token)
 {
-    std::map<Name, Register> registerTable = getRegisterTable();
+    std::map<Name, Register_Id> registerTable = getRegisterTable();
     return registerTable.find(token) != registerTable.end();
 }
 
-Register RegisterTable::getRegister(const std::string& token)
+Register_Id RegisterTable::getRegister(const std::string& token)
 {
-    std::map<Name, Register> registerTable = getRegisterTable();
+    std::map<Name, Register_Id> registerTable = getRegisterTable();
     return registerTable[token]; 
 }

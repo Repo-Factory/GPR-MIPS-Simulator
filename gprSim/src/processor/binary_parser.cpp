@@ -4,9 +4,12 @@ constexpr const int IMMEDIATE_BITS    = 16;
 constexpr const int OFFSET_BITS       = 16;
 constexpr const int REGISTER_BITS     = 5; 
 
-int32_t xOnes(const int x) // Generate Bit Stream of X number of Ones
+namespace
 {
-    return ((1 << x) - 1);
+    int32_t xOnes(const int x) // Generate Bit Stream of X number of Ones
+    {
+        return ((1 << x) - 1);
+    }
 }
 
 /* 
@@ -58,7 +61,7 @@ BNE_Instruction BinaryParser::PARSE_BNE(const int32_t instruction, MIPSCPU& cpu)
     const int32_t r_src_identifier   = instruction >> 21    & xOnes(REGISTER_BITS);
     const int32_t r_src2_identifier  = instruction >> 16    & xOnes(REGISTER_BITS);
     const int32_t label              = instruction >> 0     & xOnes(16);
-    return BNE_Instruction{cpu.registerMap[r_src_identifier], cpu.registerMap[r_src2_identifier], label};
+    return BNE_Instruction           {cpu.registerMap[r_src_identifier], cpu.registerMap[r_src2_identifier], label};
 }
 
 LA_Instruction BinaryParser::PARSE_LA(const int32_t instruction, MIPSCPU& cpu)
@@ -79,7 +82,7 @@ LB_Instruction BinaryParser::PARSE_LB(const int32_t instruction, MIPSCPU& cpu)
 LI_Instruction BinaryParser::PARSE_LI(const int32_t instruction, MIPSCPU& cpu)
 {
     const int32_t r_dest_identifier   = instruction >> 21    & xOnes(REGISTER_BITS);
-    const int32_t imm                 = instruction >> 0   & xOnes(IMMEDIATE_BITS);
+    const int32_t imm                 = instruction >> 0     & xOnes(IMMEDIATE_BITS);
     return LI_Instruction{cpu.registerMap[r_dest_identifier], imm};
 }
 
