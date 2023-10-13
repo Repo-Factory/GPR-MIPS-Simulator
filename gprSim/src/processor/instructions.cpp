@@ -28,16 +28,16 @@ std::map<Name, Opcode> getOpcodeTable()
 {
     return std::map<Name, Opcode>
     {
-        {"ADDI",    static_cast<int32_t>(Identifier::ADDI)   },
-        {"B",       static_cast<int32_t>(Identifier::B)      },
-        {"BEQZ",    static_cast<int32_t>(Identifier::BEQZ)   },
-        {"BGE",     static_cast<int32_t>(Identifier::BGE)    },
-        {"BNE",     static_cast<int32_t>(Identifier::BNE)    },
-        {"LA",      static_cast<int32_t>(Identifier::LA)     },
-        {"LB",      static_cast<int32_t>(Identifier::LB)     },
-        {"LI",      static_cast<int32_t>(Identifier::LI)     },
-        {"SUBI",    static_cast<int32_t>(Identifier::SUBI)   },
-        {"SYSCALL", static_cast<int32_t>(Identifier::SYSCALL)} 
+        {"ADDI",    static_cast<int32_t>(Instruction::ADDI)   },
+        {"B",       static_cast<int32_t>(Instruction::B)      },
+        {"BEQZ",    static_cast<int32_t>(Instruction::BEQZ)   },
+        {"BGE",     static_cast<int32_t>(Instruction::BGE)    },
+        {"BNE",     static_cast<int32_t>(Instruction::BNE)    },
+        {"LA",      static_cast<int32_t>(Instruction::LA)     },
+        {"LB",      static_cast<int32_t>(Instruction::LB)     },
+        {"LI",      static_cast<int32_t>(Instruction::LI)     },
+        {"SUBI",    static_cast<int32_t>(Instruction::SUBI)   },
+        {"SYSCALL", static_cast<int32_t>(Instruction::SYSCALL)} 
     };
 }
 

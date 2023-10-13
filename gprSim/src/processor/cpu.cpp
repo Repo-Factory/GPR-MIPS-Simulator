@@ -12,8 +12,10 @@
 #include "cpu.hpp"
 #include "memory.hpp"
 #include "debug_helpers.hpp"
-#include "bit_operations.hpp"
+#include "instructions.hpp"
 #include <iostream>
+
+constexpr const int NON_OPCODE_BITS = 32-6;
 
 int CycleTable[10][5] = 
 {
@@ -29,76 +31,101 @@ int CycleTable[10][5] =
     {2,1,2,2,1}
 };
 
-/* Constexpr bit streams of strings calculated at compile time to run efficiently and work nicely in switch statement */
-constexpr const char*   ANSWER_SYMBOL                       =   "ANS";
-constexpr const char*   LOAD_INSTRUCTION                    =   "LOAD";
-constexpr const char*   STO_INSTRUCTION                     =   "STO";
-constexpr const char*   ADD_INSTRUCTION                     =   "ADD";
-constexpr const char*   MULT_INSTRUCTION                    =   "MUL";
-constexpr const char*   END_INSTRUCTION                     =   "END";
-constexpr const int32_t ANSWER_BIT_STREAM                   =   computeBitStream(ANSWER_SYMBOL);        // Defined in helpers/bit_operations.hpp
-constexpr const int32_t LOAD_INSTRUCTION_BIT_STREAM         =   computeBitStream(LOAD_INSTRUCTION);
-constexpr const int32_t STO_INSTRUCTION_BIT_STREAM          =   computeBitStream(STO_INSTRUCTION);
-constexpr const int32_t ADD_INSTRUCTION_BIT_STREAM          =   computeBitStream(ADD_INSTRUCTION);
-constexpr const int32_t MULT_INSTRUCTION_BIT_STREAM         =   computeBitStream(MULT_INSTRUCTION);
-constexpr const int32_t END_INSTRUCTION_BIT_STREAM          =   computeBitStream(END_INSTRUCTION);
+int32_t extractOpcode(const int32_t instruction)
+{
+    std::cout << (instruction >> NON_OPCODE_BITS) << std::endl;
+}
 
 /* Called in loop from main to run program */
 void executeInstruction(MIPSCPU& cpu) 
 {
-    switch ((readContents(cpu.pc)))         // Read instruction at PC
+    switch ((extractOpcode(readContents(cpu.pc++)))) // Read instruction at PC and increment PC after             
     {
-        case LOAD_INSTRUCTION_BIT_STREAM:
-            load(cpu);
-            break;
-        case STO_INSTRUCTION_BIT_STREAM:
-            store(cpu);
-            break;
-        case ADD_INSTRUCTION_BIT_STREAM:
-            add(cpu);
-            break;
-        case MULT_INSTRUCTION_BIT_STREAM:
-            mult(cpu);
-            break;
-        case END_INSTRUCTION_BIT_STREAM:
-            end(cpu);
-            break;
+        case ADDI_OPCODE():
+             ADDI(cpu);
+             break;
+        case B_OPCODE():
+             B(cpu);
+             break;
+        case BEQZ_OPCODE():
+             BEQZ(cpu);
+             break;
+        case BGE_OPCODE():
+             BGE(cpu);
+             break;
+        case BNE_OPCODE():
+             BNE(cpu);
+             break;
+        case LA_OPCODE():
+             LA(cpu);
+             break;
+        case LB_OPCODE():
+             LB(cpu);
+             break;
+        case LI_OPCODE():
+             LI(cpu);
+             break;
+        case SUBI_OPCODE():
+             SUBI(cpu);
+             break;
+        case SYSCALL_OPCODE():
+             SYSCALL(cpu);
+             break;
     }
-    cpu.pc++;                               // Always increment PC
+    if (cpu.pc == cpu.memory.userTextPtr + 27) exit(0);
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 /**** These functions will manipulate values in the accumulator to perform calculation ****/
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-
-/* Read contents of the succeeding symbol and place them into accumulator */
-void load(MIPSCPU& cpu) 
+void ADDI(MIPSCPU& cpu)
 {
-    // writeContents(cpu.accumulator, readContents(cpu.memory.symbol_table[readContents(++cpu.pc)]));
+
 }
 
-/* Into the contents of the succeeding symbol, write the contents of the accumulator */
-void store(MIPSCPU& cpu) 
+void B(MIPSCPU& cpu)
 {
-    // writeContents(cpu.memory.symbol_table[readContents(++cpu.pc)], *cpu.accumulator);
+
 }
 
-/* Get the contents of the succeeding symbol and the accumulator, add them together, write answer into accumulator  */
-void add(MIPSCPU& cpu) 
+void BEQZ(MIPSCPU& cpu)
 {
-    // writeContents(cpu.accumulator, readContents(cpu.accumulator) + readContents(cpu.memory.symbol_table[readContents(++cpu.pc)]));
+
 }
 
-/* Get the contents of the succeeding symbol and the accumulator, multiply them together, write answer into accumulator  */
-void mult(MIPSCPU& cpu) 
+void BGE(MIPSCPU& cpu)
 {
-    // writeContents(cpu.accumulator, readContents(cpu.accumulator) * readContents(cpu.memory.symbol_table[readContents(++cpu.pc)]));
+
 }
 
-/* Switch user mode to false to exit instruction loop */
-void end(MIPSCPU& cpu) 
+void BNE(MIPSCPU& cpu)
 {
-    // std::cout << "Quadratic Evaluation of Given Operands is " << readContents(cpu.memory.symbol_table[ANSWER_BIT_STREAM]) << "\n";
-    cpu.userMode = false;
+
+}
+
+void LA(MIPSCPU& cpu)
+{
+
+}
+
+void LB(MIPSCPU& cpu)
+{
+
+}
+
+void LI(MIPSCPU& cpu)
+{
+
+}
+
+void SUBI(MIPSCPU& cpu)
+{
+
+}
+
+void SYSCALL(MIPSCPU& cpu)
+{
+
 }

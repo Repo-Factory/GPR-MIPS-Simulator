@@ -39,9 +39,9 @@ int main() {
     // int totalCycles = 0;
     // float speed_up = SPEED_UP(instructionsExecuted, totalCycles); 
     
-    // cpu->userMode = true;
-    // while (cpu->userMode) 
-    //     executeInstruction(*cpu);                                // defined in cpu.cpp
+    cpu->userMode = true;
+    while (cpu->userMode) 
+        executeInstruction(*cpu);                                // defined in cpu.cpp
     
     // FILE* output = popen(OUTPUT_FILE, WRITE_MODE);
     // fprintf(output, OUTPUT_MESSAGE, instructionsExecuted, totalCycles, speed_up);

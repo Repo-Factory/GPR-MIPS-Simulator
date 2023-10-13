@@ -47,11 +47,16 @@ struct MIPSCPU // CPU has memory and registers (in this case accumulator & progr
 };
 
 /* Functions which implement each instruction in simulator */
-void load(MIPSCPU& cpu);
-void store(MIPSCPU& cpu);
-void add(MIPSCPU& cpu);
-void mult(MIPSCPU& cpu);
-void end(MIPSCPU& cpu);
+void ADDI(MIPSCPU& cpu);
+void B(MIPSCPU& cpu);
+void BEQZ(MIPSCPU& cpu);
+void BGE(MIPSCPU& cpu);
+void BNE(MIPSCPU& cpu);
+void LA(MIPSCPU& cpu);
+void LB(MIPSCPU& cpu);
+void LI(MIPSCPU& cpu);
+void SUBI(MIPSCPU& cpu);
+void SYSCALL(MIPSCPU& cpu);
 
 /* Primary function called in loop from main to simulate machine */
 void executeInstruction(MIPSCPU& cpu);
@@ -69,15 +74,3 @@ enum class FunctionalUnits
 
 
 #endif
-
-/* ADDI Rdest, Rsrc1, Imm
-B label
-BEQZ Rsrc1, label
-BGE Rsrc1, Rsrc2, label
-BNE Rsrc1, Rsrc2, label
-LA Rdest, label
-3
-LB Rdest, offset(Rsrc1)
-LI Rdest, Imm 
-SUBI Rdest, Rsrc1, Imm
-SYSCALL */
