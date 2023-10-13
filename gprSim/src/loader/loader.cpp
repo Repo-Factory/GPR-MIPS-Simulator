@@ -16,7 +16,7 @@
 #define DATA_SECTION_IDENTIFIER ".data"
 #define TEXT_SECTION_IDENTIFIER ".text"
 #define LABEL_IDENTIFIER        ':'
-#define COMMENT_IDENTIFIER      '#'
+#define COMMENT_IDENTIFIER_LITERAL      '#'
 #define WHITE_SPACE_IDENTIFIER  ' '
 #define FIRST_CHAR(line) line[0]
 #define REMOVE_LAST_CHAR(string) string.substr(0, string.size()-1)
@@ -30,36 +30,51 @@ namespace // Keep private implementation out of Public API with anonymous namesp
         while (!sourceCode.eof()) {
             const std::string line = getLine(sourceCode);
             if (line.find_first_not_of(WHITE_SPACE_IDENTIFIER) == std::string::npos) continue; // Skip empty lines
-            if (FIRST_CHAR(line) == COMMENT_IDENTIFIER)                              continue; // Skip commented lines
+            if (FIRST_CHAR(line) == COMMENT_IDENTIFIER_LITERAL)                              continue; // Skip commented lines
             performActionOnLine(line);
         }
     }
 }
 
+void* handleASCIIData(std::istringstream& tokens)
+{
+    std::string data;
+    std::getline(tokens >> std::ws, data);
+    std::string* entry = new std::string();      // Allocate a byte for each character of string
+    *entry = data;
+    return (void*)entry;
+}
+
+void* handleBytesData(std::istringstream& tokens)
+{
+    std::string word;
+    tokens >> word;
+    return (void*)malloc(std::stoi(word) * sizeof(char));   // Allocate number of bytes indicated
+}
 
 namespace
 {
+    constexpr const char* ASCII_IDENTIFIER   = "\".asciiz\"";
+    constexpr const char* BYTES_IDENTIFER    = "\".space\"";
+    constexpr const char* COMMENT_IDENTIFIER = "#";
+    constexpr const char* INVALID_OPTION_MESSAGE = "%s is Not a Valid Data Section Identifier";
+
     void* allocateDataEntry(const std::string& line)
     {
         std::istringstream tokens(line);
         std::string word;
         tokens >> word;         // Skip first  which is the label
         tokens >> word;         // Check the second word for type
-        if (word=="#") {
+        if (word==COMMENT_IDENTIFIER) {
             return NULL;
         }
-        if (word=="\".asciiz\"") {
-            std::string data;
-            std::getline(tokens >> std::ws, data);
-            std::string* entry = new std::string();      // Allocate a byte for each character of string
-            *entry = data;
-            return (void*)entry;
+        if (word==ASCII_IDENTIFIER) {
+            return handleASCIIData(tokens);
         }
-        if (word == "\".space\"") {
-            tokens >> word;
-            return (void*)malloc(std::stoi(word) * sizeof(char));   // Allocate number of bytes indicated
+        if (word == BYTES_IDENTIFER) {
+            return handleBytesData(tokens);
         }
-        printf("%s is Not a Valid Data Section Identifier", word.c_str());
+        printf(INVALID_OPTION_MESSAGE, word.c_str());
         exit(EXIT_FAILURE);
     }
 }
