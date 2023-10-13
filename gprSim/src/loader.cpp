@@ -126,8 +126,11 @@ void Loader::performSecondPass(Memory& memory, std::ifstream& sourceCode)
 void debugPrint(Memory& memory)
 {
     for (int i = 0; i < 256; ++i) {
-        std::cout << "Memory[" << i << "]: "; printBinary(*((int32_t*)&memory + i)); std::cout << std::endl;
+        std::cout << "Memory[" << i << "]: "; printBinary(*((int32_t*)&memory + i));
     }
+    std::cout << &memory + 5648;
+    // std::cout << *(std::string*)memory.symbol_table["is_palin_msg"];
+    // std::cout << (char*)memory.symbol_table["is_palin_msg"] - (char*)&memory;
     std::cout << memory.symbol_table;
 }
 
