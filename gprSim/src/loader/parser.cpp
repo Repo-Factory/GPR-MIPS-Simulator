@@ -24,6 +24,7 @@
 #include "file_handling_helpers.hpp"
 #include "instructions.hpp"
 #include <iostream>
+#include <cmath>
 
 // Lengths in bits
 constexpr const int INSTRUCTION_LENGTH                          = 32;
@@ -69,7 +70,7 @@ namespace
 namespace
 {
     // Pass in memory for the symbol table
-    BitStream getBitStreamFromToken(const int current_bit, const std::string& token, Memory& memory)
+    BitStream getBitStreamFromToken(const int current_bit, const std::string& token, Memory& memory, int32_t* LOCCTR)
     {
         if (is_opcode(token)) 
             return BitStream{OPCODE_LENGTH, Encoder::encodeOpCode(token)};
@@ -80,20 +81,19 @@ namespace
         if (is_immediate(token)) 
             return BitStream{current_bit, Encoder::encodeImmediate(token)};
         else 
-            return BitStream{current_bit, Encoder::encodeLabel(token, memory)};
+            return BitStream{current_bit, (Encoder::encodeLabel(token, memory, LOCCTR)) & ((1<<current_bit)-1)}; // & (int32_t)std::pow(2, current_bit)
     }
 }
 
-int32_t Parser::parseInstruction(const std::string& next_instruction, Memory& memory)
+int32_t Parser::parseInstruction(const std::string& next_instruction, Memory& memory, int32_t* LOCCTR)
 {
     int current_bit = INSTRUCTION_LENGTH;     ; // If we have 32 bits to fill, we start from the 32nd leftmost bit
     int32_t instruction = ALL_ZEROES;
-    std::cout << next_instruction << std::endl;
+    // std::cout << next_instruction << std::endl;
     iterateTokens(next_instruction, [&](const std::string& token) {
-        const BitStream bit_stream = getBitStreamFromToken(current_bit, token, memory);
-        printBinary(bit_stream.stream);
-        current_bit -= bit_stream.size;
-        instruction |= (bit_stream.stream << (current_bit));
+        const BitStream bit_stream = getBitStreamFromToken(current_bit, token, memory, LOCCTR);
+        // printBinary(bit_stream.stream);
+        instruction |= (bit_stream.stream << (current_bit -= bit_stream.size));
     });
     return instruction;
 }

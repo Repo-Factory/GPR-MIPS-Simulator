@@ -15,6 +15,7 @@ add_library(
   src/loader/parser.cpp
   src/loader/encoder.cpp
   src/loader/loader.cpp
+  src/loader/symbol_table.cpp
   src/processor/instructions.cpp
   src/processor/cpu.cpp
   src/processor/memory.cpp

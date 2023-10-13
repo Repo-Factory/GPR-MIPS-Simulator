@@ -13,9 +13,9 @@
 constexpr const int NO_OFFSET           = 0;
 constexpr const int REGISTER_LENGTH     = 5;
 constexpr const int IMMEDIATE_LENGTH    = 16;
-constexpr const int OFFSET_LENGTH       = REGISTER_LENGTH + IMMEDIATE_LENGTH;
+constexpr const int OFFSET_LENGTH       = 21;
 constexpr const int ALL_ZEROES          = 0;
-
+constexpr const int BYTES_IN_ADDRESS    = 4; // MIPS System has 4 bytes per instruction
 
 namespace // Offset Helpers
 {
@@ -71,10 +71,12 @@ int32_t Encoder::encodeOffset(const std::string& token)
     return instruction;
 }
 
-int32_t Encoder::encodeLabel(const std::string& token, Memory& memory)
+int32_t Encoder::encodeLabel(const std::string& token, Memory& memory, int32_t* LOCCTR)
 {
-    char* label_address = (char*)memory.symbol_table[token];
-    char* memory_start_address = (char*)&memory;
-    std::cout << "addr: " << static_cast<int32_t>(label_address-memory_start_address) /4 << std::endl;
-    return static_cast<int32_t>(label_address-memory_start_address) / 4;
+    const char* label_address           = (char*)memory.symbol_table[token];
+    const char* memory_address          = (char*)&memory;
+    const char* LOCCTR_address          = (char*)LOCCTR;
+    const int32_t offsetFromPC          = static_cast<int32_t>(label_address-LOCCTR_address); 
+    const int32_t offsetFromPCInBytes   = offsetFromPC / BYTES_IN_ADDRESS;
+    return offsetFromPCInBytes;
 }

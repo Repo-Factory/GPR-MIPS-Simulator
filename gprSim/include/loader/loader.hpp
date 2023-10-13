@@ -11,3 +11,8 @@ class Loader
     private:
         int32_t* LOCCTR = nullptr;                                     // Will keep track of where to load instruction to
 };
+
+namespace FirstPass
+{
+    int32_t* addSymbolTableEntryIfNecessary(int32_t* LOCCTR, Memory& memory, const std::string& line);
+}
