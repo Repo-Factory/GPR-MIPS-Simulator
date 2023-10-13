@@ -3,6 +3,21 @@
 
 #include <string>
 
+/* 
+ *          Instruction Set 
+ *      ----------------------
+ *      ADDI Rdest, Rsrc1, Imm
+ *      B label
+ *      BEQZ Rsrc1, label
+ *      BGE Rsrc1, Rsrc2, label
+ *      BNE Rsrc1, Rsrc2, label
+ *      LA Rdest, label
+ *      LB Rdest, offset(Rsrc1)
+ *      LI Rdest, Imm
+ *      SUBI Rdest, Rsrc1, Imm
+ *      SYSCALL
+ */
+
 enum class Instruction               // OpCode Mappings
 {
     ADDI                            = 0,
@@ -17,17 +32,62 @@ enum class Instruction               // OpCode Mappings
     SYSCALL                         = 9
 };
 
-namespace OpcodeTable
+struct ADDI_Instruction
 {
-    bool searchTable(const std::string& token);
-    int32_t getOpcode(const std::string& token);
-}
+    int32_t* Rdest;
+    int32_t* Rsrc1;
+    int32_t Imm;
+};
 
-namespace RegisterTable
+struct B_Instruction
 {
-    bool searchTable(const std::string& token);
-    int32_t getRegister(const std::string& token);
-}
+    int32_t label;
+};
+
+struct BEQZ_Instruction
+{
+    int32_t* Rsrc1;
+    int32_t label;
+};
+
+struct BGE_Instruction
+{
+    int32_t* Rsrc1;
+    int32_t* Rsrc2;
+    int32_t label;
+};
+
+struct BNE_Instruction
+{
+    int32_t* Rsrc1;
+    int32_t* Rsrc2;
+    int32_t label;
+};
+
+struct LA_Instruction
+{
+    int32_t* Rdest;
+    int32_t label;
+};
+
+struct LB_Instruction
+{
+    int32_t* Rdest;
+    int32_t* Rsrc1;
+    int32_t offset;
+};
+
+struct LI_Instruction
+{
+    int32_t* Rdest;
+    int32_t Imm;
+};
+struct SUBI_Instruction
+{
+    int32_t* Rdest;
+    int32_t* Rsrc1;
+    int32_t Imm;
+};
 
 constexpr int32_t ADDI_OPCODE()
 {
@@ -70,3 +130,15 @@ constexpr int32_t SYSCALL_OPCODE()
     return static_cast<int32_t>(Instruction::SYSCALL);
 }
 #endif
+
+namespace OpcodeTable
+{
+    bool searchTable(const std::string& token);
+    int32_t getOpcode(const std::string& token);
+}
+
+namespace RegisterTable
+{
+    bool searchTable(const std::string& token);
+    int32_t getRegister(const std::string& token);
+}

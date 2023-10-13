@@ -1,9 +1,7 @@
 /* 
- * @brief instructions does something cool
+ * @brief Houses mappings from strings to machine useable values
  *
- * more
- * more
- * more
+ * Instructions from Strings in Source file need to be converted to designated opcodes/registers of CPU
  */
 
 #include "instructions.hpp"
@@ -96,14 +94,14 @@ std::map<Name, Register> getRegisterTable()
     };
 }
 
-Register RegisterTable::getRegister(const std::string& token)
-{
-    std::map<Name, Register> registerTable = getRegisterTable();
-    return registerTable[token]; 
-}
-
 bool RegisterTable::searchTable(const std::string& token)
 {
     std::map<Name, Register> registerTable = getRegisterTable();
     return registerTable.find(token) != registerTable.end();
+}
+
+Register RegisterTable::getRegister(const std::string& token)
+{
+    std::map<Name, Register> registerTable = getRegisterTable();
+    return registerTable[token]; 
 }

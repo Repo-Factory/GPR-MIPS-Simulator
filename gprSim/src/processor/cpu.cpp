@@ -13,9 +13,12 @@
 #include "memory.hpp"
 #include "debug_helpers.hpp"
 #include "instructions.hpp"
+#include "binary_parser.hpp"
 #include <iostream>
 
-constexpr const int NON_OPCODE_BITS = 32-6;
+constexpr const int INSTRUCTION_SIZE    = 32;
+constexpr const int OPCODE_BITS         = 6; 
+constexpr const int NON_OPCODE_BITS     = INSTRUCTION_SIZE-OPCODE_BITS;
 
 int CycleTable[10][5] = 
 {
@@ -33,43 +36,44 @@ int CycleTable[10][5] =
 
 int32_t extractOpcode(const int32_t instruction)
 {
-    std::cout << (instruction >> NON_OPCODE_BITS) << std::endl;
+    return (instruction >> NON_OPCODE_BITS);
 }
 
 /* Called in loop from main to run program */
 void executeInstruction(MIPSCPU& cpu) 
 {
-    switch ((extractOpcode(readContents(cpu.pc++)))) // Read instruction at PC and increment PC after             
+    const int32_t instruction = readContents(cpu.pc++);
+    switch ((extractOpcode(instruction))) // Read instruction at PC and increment PC after             
     {
         case ADDI_OPCODE():
-             ADDI(cpu);
+             ADDI(instruction, cpu);
              break;
         case B_OPCODE():
-             B(cpu);
+             B(instruction, cpu);
              break;
         case BEQZ_OPCODE():
-             BEQZ(cpu);
+             BEQZ(instruction, cpu);
              break;
         case BGE_OPCODE():
-             BGE(cpu);
+             BGE(instruction, cpu);
              break;
         case BNE_OPCODE():
-             BNE(cpu);
+             BNE(instruction, cpu);
              break;
         case LA_OPCODE():
-             LA(cpu);
+             LA(instruction, cpu);
              break;
         case LB_OPCODE():
-             LB(cpu);
+             LB(instruction, cpu);
              break;
         case LI_OPCODE():
-             LI(cpu);
+             LI(instruction, cpu);
              break;
         case SUBI_OPCODE():
-             SUBI(cpu);
+             SUBI(instruction, cpu);
              break;
         case SYSCALL_OPCODE():
-             SYSCALL(cpu);
+             SYSCALL(instruction, cpu);
              break;
     }
     if (cpu.pc == cpu.memory.userTextPtr + 27) exit(0);
@@ -80,52 +84,66 @@ void executeInstruction(MIPSCPU& cpu)
 /**** These functions will manipulate values in the accumulator to perform calculation ****/
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-void ADDI(MIPSCPU& cpu)
+
+void ADDI(const int32_t instruction, MIPSCPU& cpu)
+{
+    const ADDI_Instruction addi_instruction = PARSE_ADDI(instruction, cpu);
+    *addi_instruction.Rdest = *addi_instruction.Rsrc1 + addi_instruction.Imm;
+}
+
+void B(const int32_t instruction, MIPSCPU& cpu)
+{
+    const B_Instruction b_instruction = PARSE_B(instruction, cpu);
+    cpu.pc += b_instruction.label;
+}
+
+void BEQZ(const int32_t instruction, MIPSCPU& cpu)
+{
+    const BEQZ_Instruction beqz_instruction = PARSE_BEQZ(instruction, cpu);
+    if (*beqz_instruction.Rsrc1 == 0) { 
+        cpu.pc+=beqz_instruction.label;
+    }
+}
+
+void BGE(const int32_t instruction, MIPSCPU& cpu)
+{
+    const BGE_Instruction bge_instruction = PARSE_BGE(instruction, cpu);
+    if (*bge_instruction.Rsrc1 >= *bge_instruction.Rsrc2) {
+        cpu.pc+=bge_instruction.label;
+    }
+}
+
+void BNE(const int32_t instruction, MIPSCPU& cpu)
+{
+    const BNE_Instruction bne_instruction = PARSE_BNE(instruction, cpu);
+    if (*bne_instruction.Rsrc1 != *bne_instruction.Rsrc2) {
+        cpu.pc+=bne_instruction.label;
+    }
+}
+
+void LA(const int32_t instruction, MIPSCPU& cpu)
+{
+    
+
+
+}
+
+void LB(const int32_t instruction, MIPSCPU& cpu)
 {
 
 }
 
-void B(MIPSCPU& cpu)
+void LI(const int32_t instruction, MIPSCPU& cpu)
 {
 
 }
 
-void BEQZ(MIPSCPU& cpu)
+void SUBI(const int32_t instruction, MIPSCPU& cpu)
 {
 
 }
 
-void BGE(MIPSCPU& cpu)
-{
-
-}
-
-void BNE(MIPSCPU& cpu)
-{
-
-}
-
-void LA(MIPSCPU& cpu)
-{
-
-}
-
-void LB(MIPSCPU& cpu)
-{
-
-}
-
-void LI(MIPSCPU& cpu)
-{
-
-}
-
-void SUBI(MIPSCPU& cpu)
-{
-
-}
-
-void SYSCALL(MIPSCPU& cpu)
+void SYSCALL(const int32_t instruction, MIPSCPU& cpu)
 {
 
 }
