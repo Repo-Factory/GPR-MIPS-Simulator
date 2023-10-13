@@ -102,7 +102,6 @@ void handleSecondPass(Loader* loader, Memory& memory, char* assemblyPath)
     sourceCode.close();
 }
 
-
 /* Simple entry point to load program which will open the program, iterate through it, and close it */
 void Loader::loadProgram(Memory& memory, char* assemblyPath)
 {

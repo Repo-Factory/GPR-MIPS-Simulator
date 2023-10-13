@@ -43,6 +43,7 @@ int32_t extractOpcode(const int32_t instruction)
 void executeInstruction(MIPSCPU& cpu) 
 {
     const int32_t instruction = readContents(cpu.pc++);
+    printBinary(instruction);
     switch ((extractOpcode(instruction))) // Read instruction at PC and increment PC after             
     {
         case ADDI_OPCODE():
@@ -94,14 +95,14 @@ void ADDI(const int32_t instruction, MIPSCPU& cpu)
 void B(const int32_t instruction, MIPSCPU& cpu)
 {
     const B_Instruction b_instruction = BinaryParser::PARSE_B(instruction, cpu);
-    cpu.pc += b_instruction.label;
+    cpu.pc += b_instruction.label-1;
 }
 
 void BEQZ(const int32_t instruction, MIPSCPU& cpu)
 {
     const BEQZ_Instruction beqz_instruction = BinaryParser::PARSE_BEQZ(instruction, cpu);
     if (*beqz_instruction.Rsrc1 == 0) { 
-        cpu.pc+=beqz_instruction.label;
+        cpu.pc+=beqz_instruction.label-1;
     }
 }
 
@@ -109,7 +110,7 @@ void BGE(const int32_t instruction, MIPSCPU& cpu)
 {
     const BGE_Instruction bge_instruction = BinaryParser::PARSE_BGE(instruction, cpu);
     if (*bge_instruction.Rsrc1 >= *bge_instruction.Rsrc2) {
-        cpu.pc+=bge_instruction.label;
+        cpu.pc+=bge_instruction.label-1;
     }
 }
 
@@ -117,14 +118,14 @@ void BNE(const int32_t instruction, MIPSCPU& cpu)
 {
     const BNE_Instruction bne_instruction = BinaryParser::PARSE_BNE(instruction, cpu);
     if (*bne_instruction.Rsrc1 != *bne_instruction.Rsrc2) {
-        cpu.pc+=bne_instruction.label;
+        cpu.pc+=bne_instruction.label-1;
     }
 }
 
 void LA(const int32_t instruction, MIPSCPU& cpu)
 {
     const LA_Instruction la_instruction = BinaryParser::PARSE_LA(instruction, cpu);
-    *la_instruction.Rdest = la_instruction.label;
+    *la_instruction.Rdest = la_instruction.label-1;
 }
 
 void LB(const int32_t instruction, MIPSCPU& cpu)
@@ -148,22 +149,22 @@ void SUBI(const int32_t instruction, MIPSCPU& cpu)
 
 void SYSCALL(const int32_t instruction, MIPSCPU& cpu)
 {
-    // const int32_t* $v0 = cpu.registerMap[RegisterTable::getRegister("$v0")];
-    // const int32_t* $a0 = cpu.registerMap[RegisterTable::getRegister("$a0")];
-    // std::string input;
+    const int32_t* $v0 = cpu.registerMap[RegisterTable::getRegister("$v0")];
+    const int32_t* $a0 = cpu.registerMap[RegisterTable::getRegister("$a0")];
+    std::string input;
 
-    // if (*$v0 == 4) {
-    //     printf("Please Enter A String To Check If It Is A Palindrome");
-    //     std::cin >> input;
-    //     int32_t* ptr = (int32_t*)&cpu.memory+*$a0;
-    //     std::string* str_ptr = (std::string*)ptr;
-    //     *str_ptr = input;
-    // }
-    // if (*$v0 == 8) {
-    //     int32_t* ptr = (int32_t*)&cpu.memory+*$a0;
-    //     std::cout << *(std::string*)ptr << std::endl;
-    // }
-    // if (*$v0 == 10) {
-    //     exit(EXIT_SUCCESS);
-    // }
+    if (*$v0 == 4) {
+        int32_t* ptr = (int32_t*)&cpu.memory+*$a0;
+        std::cout << *(std::string*)ptr << std::endl;
+    }
+    if (*$v0 == 8) {
+        printf("Please Enter A String To Check If It Is A Palindrome");
+        std::cin >> input;
+        int32_t* ptr = (int32_t*)&cpu.memory+*$a0;
+        std::string* str_ptr = (std::string*)ptr;
+        *str_ptr = input;
+    }
+    if (*$v0 == 10) {
+        exit(EXIT_SUCCESS);
+    }
 }

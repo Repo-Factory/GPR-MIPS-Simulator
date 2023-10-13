@@ -88,10 +88,10 @@ int32_t Parser::parseInstruction(const std::string& next_instruction, Memory& me
 {
     int current_bit = INSTRUCTION_LENGTH;     ; // If we have 32 bits to fill, we start from the 32nd leftmost bit
     int32_t instruction = ALL_ZEROES;
-    // std::cout << next_instruction << std::endl;
+    std::cout << next_instruction << std::endl;
     iterateTokens(next_instruction, [&](const std::string& token) {
         const BitStream bit_stream = getBitStreamFromToken(current_bit, token, memory, LOCCTR);
-        // printBinary(bit_stream.stream);
+        printBinary(bit_stream.stream);
         instruction |= (bit_stream.stream << (current_bit -= bit_stream.size));
     });
     return instruction;

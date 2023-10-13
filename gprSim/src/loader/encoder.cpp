@@ -38,11 +38,11 @@ namespace // Offset Helpers
     OffsetInstruction splitOffsetInstruction(const std::string& token)
     {
         int integer_portion = NO_OFFSET;
-        OffsetInfo offsetInfo = getOffsetInfo(token);
+        const OffsetInfo offsetInfo = getOffsetInfo(token);
         if (offsetInfo.integer_portion_str.size() > 0) {
             integer_portion = std::stoi(offsetInfo.integer_portion_str);
         }
-        std::string register_portion = token.substr(offsetInfo.register_portion_index+1, token.size()-2); // ($t3) cut off parantheses
+        const std::string register_portion = token.substr(offsetInfo.register_portion_index+1, token.size()-2); // ($t3) cut off parantheses
         return OffsetInstruction{integer_portion, Encoder::encodeRegister(register_portion)};
     }
 }

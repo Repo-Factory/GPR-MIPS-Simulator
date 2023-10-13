@@ -37,7 +37,7 @@ ADDI_Instruction BinaryParser::PARSE_ADDI(const int32_t instruction, MIPSCPU& cp
 
 B_Instruction BinaryParser::PARSE_B(const int32_t instruction, MIPSCPU& cpu)
 {
-    const int32_t label               = instruction >> 0 & xOnes(26);
+    const int32_t label               = (((instruction >> 0 & xOnes(26)) << 6) >> 6);
     return B_Instruction              {label};
 }
 
@@ -68,7 +68,7 @@ LA_Instruction BinaryParser::PARSE_LA(const int32_t instruction, MIPSCPU& cpu)
 {
     const int32_t r_src_identifier   = instruction >> 21    & xOnes(REGISTER_BITS);
     const int32_t label              = instruction >> 0     & xOnes(21);
-    return LA_Instruction{cpu.registerMap[r_src_identifier], label};
+    return LA_Instruction            {cpu.registerMap[r_src_identifier], label};
 }
 
 LB_Instruction BinaryParser::PARSE_LB(const int32_t instruction, MIPSCPU& cpu)
@@ -76,14 +76,14 @@ LB_Instruction BinaryParser::PARSE_LB(const int32_t instruction, MIPSCPU& cpu)
     const int32_t r_dest_identifier   = instruction >> 21    & xOnes(REGISTER_BITS);
     const int32_t r_src_identifier    = instruction >> 16    & xOnes(REGISTER_BITS);
     const int32_t offset              = instruction >> 0     & xOnes(OFFSET_BITS);
-    return LB_Instruction{cpu.registerMap[r_dest_identifier], cpu.registerMap[r_src_identifier], offset};
+    return LB_Instruction             {cpu.registerMap[r_dest_identifier], cpu.registerMap[r_src_identifier], offset};
 }
 
 LI_Instruction BinaryParser::PARSE_LI(const int32_t instruction, MIPSCPU& cpu)
 {
     const int32_t r_dest_identifier   = instruction >> 21    & xOnes(REGISTER_BITS);
     const int32_t imm                 = instruction >> 0     & xOnes(IMMEDIATE_BITS);
-    return LI_Instruction{cpu.registerMap[r_dest_identifier], imm};
+    return LI_Instruction             {cpu.registerMap[r_dest_identifier], imm};
 }
 
 SUBI_Instruction BinaryParser::PARSE_SUBI(const int32_t instruction, MIPSCPU& cpu)
@@ -91,5 +91,5 @@ SUBI_Instruction BinaryParser::PARSE_SUBI(const int32_t instruction, MIPSCPU& cp
     const int32_t r_dest_identifier   = instruction >> 21    & xOnes(REGISTER_BITS);
     const int32_t r_src_identifier    = instruction >> 16    & xOnes(REGISTER_BITS);
     const int32_t imm                 = instruction >> 0     & xOnes(IMMEDIATE_BITS);
-    return SUBI_Instruction{cpu.registerMap[r_dest_identifier], cpu.registerMap[r_src_identifier], imm};
+    return SUBI_Instruction           {cpu.registerMap[r_dest_identifier], cpu.registerMap[r_src_identifier], imm};
 }
