@@ -206,7 +206,7 @@ namespace // SYSCALL HELPERS
     std::string getInputString()
     {
         std::string input;
-        printf("Please Enter A String To Check If It Is A Palindrome: ");
+        printf("Please Enter A String: ");
         std::cin >> input;
         return input;
     }

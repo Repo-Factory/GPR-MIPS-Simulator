@@ -24,13 +24,15 @@
 #include "loader.hpp"
 #include <memory>
 
-constexpr const int ASSEMBLY_PATH_INDEX = 1;
-
 /* Load instructions into memory and execute instructions forever (will stop when sycall called with appropriate argument) */
 int main(int argc, char* argv[]) {
+    #ifndef ASSEMBLY_PATH
+        const char* ASSEMBLY_PATH = argv[1];
+    #endif
+
     std::unique_ptr<Loader> loader = std::make_unique<Loader>();
     std::unique_ptr<MIPSCPU> cpu = std::make_unique<MIPSCPU>();
-    loader->loadProgram(cpu->memory, argv[ASSEMBLY_PATH_INDEX]);                   // First Command line arg will be assembly path
+    loader->loadProgram(cpu->memory, ASSEMBLY_PATH);                   // First Command line arg will be assembly path
 
     cpu->userMode = true;
     while (cpu->userMode) {
