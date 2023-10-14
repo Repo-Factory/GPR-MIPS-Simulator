@@ -4,7 +4,7 @@
 class Loader
 {
     public:
-        void loadProgram(Memory& memory, char* assemblyPath);          // API to load assembly into memory
+        void loadProgram(Memory& memory, const char* assemblyPath);          // API to load assembly into memory
     private:
         void performFirstPass(Memory& memory, std::ifstream& sourceCode);
         void performSecondPass(Memory& memory, std::ifstream& sourceCode);

@@ -8,7 +8,7 @@
     
 const std::string COMMENT_IDENTIFIER = "#";
 
-void handleFileError(std::ifstream& stream, char* file)
+void handleFileError(std::ifstream& stream, const char* file)
 {   
     if (!stream) {
         std::cerr << "Failed to open file: " << file << std::endl;

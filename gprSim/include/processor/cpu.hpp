@@ -12,8 +12,10 @@ using RegisterMap       = std::map<IntegerIdentifier, Register>;
 struct MIPSCPU // CPU has memory and registers (in this case accumulator & program counter) 
 {
     Memory memory;
-    bool userMode = false;
-    int32_t* pc =   memory.userTextPtr;
+    bool userMode            = false;
+    int32_t* pc              = memory.userTextPtr;
+    int instructionsExecuted = 0;
+    int totalCycles          = 0;
     int32_t* $0 =   new int32_t();               // (zero)
     int32_t* $1 =   new int32_t();               // (at)
     int32_t* $2 =   new int32_t();               // (v0)
@@ -73,16 +75,5 @@ void SYSCALL(const int32_t instruction, MIPSCPU& cpu);
 
 /* Primary function called in loop from main to simulate machine */
 void executeInstruction(MIPSCPU& cpu);
-
-enum class FunctionalUnits
-{
-
-    InstructionMemory               = 0, 
-    RegisterFileRead                = 1, 
-    ALU                             = 2, 
-    Data                            = 3, 
-    memory                          = 4,
-    RegisterFileWrite               = 5
-};
 
 #endif

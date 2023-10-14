@@ -73,7 +73,7 @@ void Loader::performSecondPass(Memory& memory, std::ifstream& sourceCode)
 }
 
 // Wrapper for file handling
-void handlePass(char* assemblyPath, std::function<void(std::ifstream&)> performPass)
+void handlePass(const char* assemblyPath, std::function<void(std::ifstream&)> performPass)
 {
     std::ifstream sourceCode = std::ifstream(assemblyPath);
     handleFileError(sourceCode, assemblyPath);
@@ -82,7 +82,7 @@ void handlePass(char* assemblyPath, std::function<void(std::ifstream&)> performP
 }
 
 /* Simple entry point to load program from source code to memory. Uses two pass implementation*/
-void Loader::loadProgram(Memory& memory, char* assemblyPath)
+void Loader::loadProgram(Memory& memory, const char* assemblyPath)
 {
     handlePass(assemblyPath, [&](std::ifstream& sourceCode){this->performFirstPass(memory, sourceCode);});
     handlePass(assemblyPath, [&](std::ifstream& sourceCode){this->performSecondPass(memory, sourceCode);});

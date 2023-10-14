@@ -16,28 +16,40 @@
 #include "binary_parser.hpp"
 #include <iostream>
 
-#define ACCOUNT_FOR_INCREMENTED_PC(number) number-1
-int32_t* ABSOLUTE_BASE_ADDRESS(MIPSCPU& cpu) {return (int32_t*)&cpu.memory;}
+#define ALL_ZEROES           0
+#define NUM_FUNCTIONAL_UNITS 5
+#define NUM_INSTRUCTIONS     10
 
-int CycleTable[10][5] = 
+const int cycleTable[NUM_INSTRUCTIONS][NUM_FUNCTIONAL_UNITS]
+{   // InstructionMemory     RegisterFileRead       ALU     DataMemory      RegisterFileWrite
+    {          2,                   1,               2,          0,                 1           },  // ADDI 
+    {          2,                   0,               2,          0,                 0           },  // B
+    {          2,                   1,               2,          0,                 0           },  // BEQZ
+    {          2,                   1,               2,          0,                 0           },  // BGE
+    {          2,                   1,               2,          0,                 0           },  // BNE
+    {          2,                   0,               2,          0,                 2           },  // LA
+    {          2,                   1,               2,          0,                 1           },  // LB
+    {          2,                   0,               0,          0,                 1           },  // LI
+    {          2,                   1,               2,          0,                 1           },  // SUBI
+    {          2,                   1,               2,          2,                 1           }   // SYSCALL
+};
+
+const std::string functionalUnits[NUM_FUNCTIONAL_UNITS] 
 {
-    {2,1,2,0,1},
-    {2,0,2,0,0},
-    {2,1,2,0,0},
-    {2,1,2,0,0},
-    {2,1,2,0,0},
-    {2,0,2,0,2},
-    {2,1,2,0,1},
-    {2,0,0,0,1},
-    {2,1,2,0,1},
-    {2,1,2,2,1}
+    "InstructionMemory" ,"RegisterFileRead" ,"ALU" ,"DataMemory" ,"RegisterFileWrite"
+};
+
+int cyclesPerUnit[NUM_FUNCTIONAL_UNITS] 
+{
+    ALL_ZEROES   // Init Cycles for each functional unit to be 0
 };
 
 /* Called in loop from main to run program */
 void executeInstruction(MIPSCPU& cpu) 
 {
     const int32_t instruction = readContents(cpu.pc++);
-    switch ((BinaryParser::extractOpcode(instruction))) // Read instruction at PC and increment PC after             
+    const int32_t opcode = BinaryParser::extractOpcode(instruction);
+    switch ((opcode)) // Read instruction at PC and increment PC after             
     {
         case ADDI_OPCODE():
              ADDI(instruction, cpu);
@@ -68,15 +80,27 @@ void executeInstruction(MIPSCPU& cpu)
              break;
         case SYSCALL_OPCODE():
              SYSCALL(instruction, cpu);
-             break;
+             break;          
     }
+    overlayArrays(cyclesPerUnit, cycleTable[opcode], NUM_FUNCTIONAL_UNITS); // Increment cycles of each functional unit
+    cpu.instructionsExecuted++;                                             // Incremenent total instructions executed
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 /**** These functions will manipulate values in the registers to perform calculation ****/
 ////////////////////////////////////////////////////////////////////////////////////////////
 
+#define ACCOUNT_FOR_INCREMENTED_PC(number) number-1
+
+/* 
+ * We'll use this as a constant to help store absolute addresses. If you want to store an address you can go to later
+ * such as in an LA instruction, you would find the displacement from this base address and store it. Then later you 
+ * would know to use this address as the base, add the offset, and locate the address you needed 
+ */ 
+int32_t* ABSOLUTE_BASE_ADDRESS(MIPSCPU& cpu) 
+{
+    return (int32_t*)&cpu.memory;           
+}
 
 void ADDI(const int32_t instruction, MIPSCPU& cpu)
 {
@@ -124,7 +148,7 @@ void LB(const int32_t instruction, MIPSCPU& cpu)
 {
     const LB_Instruction lb_instruction = BinaryParser::PARSE_LB(instruction, cpu);
     *lb_instruction.Rdest = *(char*)(ABSOLUTE_BASE_ADDRESS(cpu) + *(lb_instruction.Rsrc1 + lb_instruction.offset));
-}
+}   // Dereferencing char pointer gives us a byte
 
 void LI(const int32_t instruction, MIPSCPU& cpu)
 {
@@ -136,6 +160,39 @@ void SUBI(const int32_t instruction, MIPSCPU& cpu)
 {
     const SUBI_Instruction subi_instruction = BinaryParser::PARSE_SUBI(instruction, cpu);
     *subi_instruction.Rdest = *subi_instruction.Rsrc1 - subi_instruction.Imm;
+}
+
+///////////////////////////////////////         SYSCALL         /////////////////////////////////////////////
+
+constexpr const char* TOTAL_INSTRUCTIONS_MESSAGE =            "Total Instructions Executed: %d\n";
+constexpr const char* TOTAL_CYCLES_MESSAGE =                  "Total Cycles Taken: %d\n";
+constexpr const char* SPEEDUP_MESSAGE =                       "Speedup: %f\n";
+constexpr const char* CYCLES_FOR_FUNCTIONAL_UNIT_MESSAGE =    "Cycles for %s: %d\n";
+
+constexpr const char* OUTPUT_FILE =                           "result2.txt";
+constexpr const char* WRITE_MODE =                            "w";
+constexpr const char* OUTPUT_MESSAGE =                        "Instructions Executed: %d\nTotal Cycles: %d\nSpeed Up: %f";
+
+constexpr const int SPEEDUP_CONSTANT =                        8;
+constexpr const float SPEEDUP(const int IC, const int C) {return SPEEDUP_CONSTANT * ((float)IC/(float)C);}
+
+void exitProcedure(MIPSCPU& cpu)
+{
+    cpu.userMode = false;
+    cpu.totalCycles = sumArray(cyclesPerUnit, NUM_FUNCTIONAL_UNITS);
+    const float speedup = SPEEDUP(cpu.instructionsExecuted, cpu.totalCycles);
+    
+    printf(TOTAL_INSTRUCTIONS_MESSAGE, cpu.instructionsExecuted);
+    printf(TOTAL_CYCLES_MESSAGE, cpu.totalCycles);
+    printf(SPEEDUP_MESSAGE, speedup);
+    
+    forEachItem(cyclesPerUnit, NUM_FUNCTIONAL_UNITS, [&](int cycles, int index) {
+        printf(CYCLES_FOR_FUNCTIONAL_UNIT_MESSAGE, functionalUnits[index].c_str(), cycles);
+    }); // Print Cycles for each functional unit
+
+    FILE* output = fopen(OUTPUT_FILE, WRITE_MODE);
+    fprintf(output, OUTPUT_MESSAGE, cpu.instructionsExecuted, cpu.totalCycles, speedup);
+    fclose(output);
 }
 
 namespace // SYSCALL HELPERS
@@ -181,6 +238,6 @@ void SYSCALL(const int32_t instruction, MIPSCPU& cpu)
         storeStringIntoAddress($a0, cpu);
     }
     if (*$v0 == EXIT_CODE) {
-        exit(EXIT_SUCCESS);
+        exitProcedure(cpu);
     }
 }

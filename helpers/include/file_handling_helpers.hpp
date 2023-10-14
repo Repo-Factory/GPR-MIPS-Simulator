@@ -3,7 +3,7 @@
 #include <string>
 #include <functional>
 
-void handleFileError(std::ifstream& stream, char* file);
+void handleFileError(std::ifstream& stream, const char* file);
 std::string getWord(std::ifstream& input);
 std::string getLine(std::ifstream& input);
 std::string getFirstWordOfLine(const std::string& line);
