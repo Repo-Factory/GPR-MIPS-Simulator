@@ -19,6 +19,7 @@
 #include "memory.hpp"
 #include <memory>
 #include <fstream>
+#include <iostream>
 
 #define SPEED_UP(IC, C) 8*IC/C
 #define OUTPUT_FILE "result2.txt"
@@ -39,6 +40,8 @@ int main() {
     // int totalCycles = 0;
     // float speed_up = SPEED_UP(instructionsExecuted, totalCycles); 
     
+    // std::string* ptr = (std::string*)(cpu->pc + 6676);
+    // std::cout << *ptr << std::endl;
     cpu->userMode = true;
     while (cpu->userMode) 
         executeInstruction(*cpu);                                // defined in cpu.cpp

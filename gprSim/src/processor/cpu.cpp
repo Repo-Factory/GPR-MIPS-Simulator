@@ -43,7 +43,7 @@ int32_t extractOpcode(const int32_t instruction)
 void executeInstruction(MIPSCPU& cpu) 
 {
     const int32_t instruction = readContents(cpu.pc++);
-    printBinary(instruction);
+    printBinary(instruction); 
     switch ((extractOpcode(instruction))) // Read instruction at PC and increment PC after             
     {
         case ADDI_OPCODE():
@@ -131,7 +131,8 @@ void LA(const int32_t instruction, MIPSCPU& cpu)
 void LB(const int32_t instruction, MIPSCPU& cpu)
 {
     const LB_Instruction lb_instruction = BinaryParser::PARSE_LB(instruction, cpu);
-    *lb_instruction.Rdest = *(lb_instruction.Rsrc1 + lb_instruction.offset);
+    *lb_instruction.Rdest = *(cpu.pc + *(lb_instruction.Rsrc1 + lb_instruction.offset));
+    std::cout << "Byte at address: " << cpu.pc+*lb_instruction.Rsrc1 << " " << *(cpu.pc + *(lb_instruction.Rsrc1 + lb_instruction.offset)) << std::endl;
 }
 
 void LI(const int32_t instruction, MIPSCPU& cpu)
@@ -146,7 +147,6 @@ void SUBI(const int32_t instruction, MIPSCPU& cpu)
     *subi_instruction.Rdest = *subi_instruction.Rsrc1 - subi_instruction.Imm;
 }
 
-
 void SYSCALL(const int32_t instruction, MIPSCPU& cpu)
 {
     const int32_t* $v0 = cpu.registerMap[RegisterTable::getRegister("$v0")];
@@ -154,15 +154,14 @@ void SYSCALL(const int32_t instruction, MIPSCPU& cpu)
     std::string input;
 
     if (*$v0 == 4) {
-        int32_t* ptr = (int32_t*)&cpu.memory+*$a0;
-        std::cout << *(std::string*)ptr << std::endl;
+        std::string* ptr = (std::string*)(cpu.pc + (*$a0-2));
+        std::cout << *ptr << std::endl;
     }
     if (*$v0 == 8) {
-        printf("Please Enter A String To Check If It Is A Palindrome");
+        printf("Please Enter A String To Check If It Is A Palindrome: ");
         std::cin >> input;
-        int32_t* ptr = (int32_t*)&cpu.memory+*$a0;
-        std::string* str_ptr = (std::string*)ptr;
-        *str_ptr = input;
+        std::string* ptr = (std::string*)(cpu.pc + (*$a0-3));
+        *ptr = input;
     }
     if (*$v0 == 10) {
         exit(EXIT_SUCCESS);

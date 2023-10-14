@@ -80,7 +80,7 @@ namespace
         if (is_immediate(token)) 
             return BitStream{current_bit, Encoder::encodeImmediate(token)};
         else 
-            return BitStream{current_bit, (Encoder::encodeLabel(token, memory, LOCCTR)) & ((1<<current_bit)-1)}; // & (int32_t)std::pow(2, current_bit)
+            return BitStream{current_bit, (Encoder::encodeLabel(token, memory, LOCCTR)) & ((1<<current_bit)-1)};
     }
 }
 

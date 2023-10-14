@@ -85,7 +85,6 @@ void Loader::performSecondPass(Memory& memory, std::ifstream& sourceCode)
     });
 }
 
-
 void handleFirstPass(Loader* loader, Memory& memory, char* assemblyPath)
 {
     std::ifstream sourceCode = std::ifstream(assemblyPath);
