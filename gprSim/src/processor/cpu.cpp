@@ -135,8 +135,6 @@ void LB(const int32_t instruction, MIPSCPU& cpu)
 {
     const LB_Instruction lb_instruction = BinaryParser::PARSE_LB(instruction, cpu);
     *lb_instruction.Rdest = *(char*)((int32_t*)&cpu.memory + *(lb_instruction.Rsrc1 + lb_instruction.offset));
-    std::cout << "Register Value: " << *lb_instruction.Rdest;
-    std::cout << *(char*)((int32_t*)&cpu.memory + *(lb_instruction.Rsrc1 + lb_instruction.offset)) << std::endl;
 }
 
 void LI(const int32_t instruction, MIPSCPU& cpu)
@@ -151,26 +149,44 @@ void SUBI(const int32_t instruction, MIPSCPU& cpu)
     *subi_instruction.Rdest = *subi_instruction.Rsrc1 - subi_instruction.Imm;
 }
 
+
+namespace // SYSCALL HELPERS
+{
+    void printStringAtAddress(const int32_t* address, MIPSCPU& cpu)
+    {
+        std::string* ptr = (std::string*)((int32_t*)&cpu.memory + (*address));
+        std::cout << *ptr << std::endl;
+    }
+
+    std::string getInputString()
+    {
+        std::string input;
+        printf("Please Enter A String To Check If It Is A Palindrome: ");
+        std::cin >> input;
+        return input;
+    }
+
+    void storeStringIntoAddress(const int32_t* address, MIPSCPU& cpu)
+    {
+        const char* input_string = getInputString().c_str();
+        int32_t* space_allocated = (int32_t*)((int32_t*)&cpu.memory + (*address));
+        while (*input_string != '\0') { // Iterate each char of input string and store them to previously allocated address
+            *space_allocated = *input_string;
+            space_allocated++; 
+            input_string++;
+        }
+    }
+}
+
 void SYSCALL(const int32_t instruction, MIPSCPU& cpu)
 {
     const int32_t* $v0 = cpu.registerMap[RegisterTable::getRegister("$v0")];
     const int32_t* $a0 = cpu.registerMap[RegisterTable::getRegister("$a0")];
-    std::string input;
-
     if (*$v0 == 4) {
-        std::string* ptr = (std::string*)((int32_t*)&cpu.memory + (*$a0));
-        std::cout << *ptr << std::endl;
+        printStringAtAddress($a0, cpu);
     }
     if (*$v0 == 8) {
-        printf("Please Enter A String To Check If It Is A Palindrome: ");
-        std::cin >> input;
-        const char* c_string = input.c_str();
-        int32_t* input_bytes = (int32_t*)((int32_t*)&cpu.memory + (*$a0));
-        while (*c_string != '\0') {
-            *input_bytes = *c_string;
-            input_bytes++; 
-            c_string++;
-        }
+        storeStringIntoAddress($a0, cpu);
     }
     if (*$v0 == 10) {
         exit(EXIT_SUCCESS);

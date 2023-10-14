@@ -40,9 +40,9 @@ int main() {
     // int totalCycles = 0;
     // float speed_up = SPEED_UP(instructionsExecuted, totalCycles); 
     
-    std::string* ptr = (std::string*)(cpu->pc + 6676);
-    std::cout << *ptr << std::endl;
-    std::cout << *((char*)ptr);
+    // std::string* ptr = (std::string*)(cpu->pc + 6676);
+    // std::cout << *ptr << std::endl;
+    // std::cout << *((char*)ptr);
     cpu->userMode = true;
     while (cpu->userMode) 
         executeInstruction(*cpu);                                // defined in cpu.cpp
