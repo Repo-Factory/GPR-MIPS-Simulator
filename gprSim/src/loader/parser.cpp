@@ -20,7 +20,6 @@
 #include "parser.hpp"
 #include "encoder.hpp"
 #include "debug_helpers.hpp"
-#include "bit_operations.hpp"
 #include "file_handling_helpers.hpp"
 #include "instructions.hpp"
 #include <iostream>

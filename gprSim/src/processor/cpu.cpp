@@ -16,12 +16,8 @@
 #include "binary_parser.hpp"
 #include <iostream>
 
-#define ACCOUNT_FOR_ADVANCED_PC(number) number-1
-
-constexpr const int INSTRUCTION_SIZE    = 32;
-constexpr const int OPCODE_BITS         = 6; 
-constexpr const int NON_OPCODE_BITS     = INSTRUCTION_SIZE-OPCODE_BITS;
-
+#define ACCOUNT_FOR_INCREMENTED_PC(number) number-1
+int32_t* ABSOLUTE_BASE_ADDRESS(MIPSCPU& cpu) {return (int32_t*)&cpu.memory;}
 
 int CycleTable[10][5] = 
 {
@@ -37,17 +33,11 @@ int CycleTable[10][5] =
     {2,1,2,2,1}
 };
 
-int32_t extractOpcode(const int32_t instruction)
-{
-    return (instruction >> NON_OPCODE_BITS);
-}
-
 /* Called in loop from main to run program */
 void executeInstruction(MIPSCPU& cpu) 
 {
     const int32_t instruction = readContents(cpu.pc++);
-    printBinary(instruction); 
-    switch ((extractOpcode(instruction))) // Read instruction at PC and increment PC after             
+    switch ((BinaryParser::extractOpcode(instruction))) // Read instruction at PC and increment PC after             
     {
         case ADDI_OPCODE():
              ADDI(instruction, cpu);
@@ -80,7 +70,6 @@ void executeInstruction(MIPSCPU& cpu)
              SYSCALL(instruction, cpu);
              break;
     }
-    if (cpu.pc == cpu.memory.userTextPtr + 27) exit(0);
 }
 
 
@@ -98,14 +87,14 @@ void ADDI(const int32_t instruction, MIPSCPU& cpu)
 void B(const int32_t instruction, MIPSCPU& cpu)
 {
     const B_Instruction b_instruction = BinaryParser::PARSE_B(instruction, cpu);
-    cpu.pc += b_instruction.label-1;
+    cpu.pc += ACCOUNT_FOR_INCREMENTED_PC(b_instruction.label);
 }
 
 void BEQZ(const int32_t instruction, MIPSCPU& cpu)
 {
     const BEQZ_Instruction beqz_instruction = BinaryParser::PARSE_BEQZ(instruction, cpu);
     if (*beqz_instruction.Rsrc1 == 0) { 
-        cpu.pc+=beqz_instruction.label-1;
+        cpu.pc+=ACCOUNT_FOR_INCREMENTED_PC(beqz_instruction.label);
     }
 }
 
@@ -113,7 +102,7 @@ void BGE(const int32_t instruction, MIPSCPU& cpu)
 {
     const BGE_Instruction bge_instruction = BinaryParser::PARSE_BGE(instruction, cpu);
     if (*bge_instruction.Rsrc1 >= *bge_instruction.Rsrc2) {
-        cpu.pc+=bge_instruction.label-1;
+        cpu.pc+=ACCOUNT_FOR_INCREMENTED_PC(bge_instruction.label);
     }
 }
 
@@ -121,20 +110,20 @@ void BNE(const int32_t instruction, MIPSCPU& cpu)
 {
     const BNE_Instruction bne_instruction = BinaryParser::PARSE_BNE(instruction, cpu);
     if (*bne_instruction.Rsrc1 != *bne_instruction.Rsrc2) {
-        cpu.pc+=bne_instruction.label-1;
+        cpu.pc+=ACCOUNT_FOR_INCREMENTED_PC(bne_instruction.label);
     }
 }
 
 void LA(const int32_t instruction, MIPSCPU& cpu)
 {
     const LA_Instruction la_instruction = BinaryParser::PARSE_LA(instruction, cpu);
-    *la_instruction.Rdest = (cpu.pc - (int32_t*)&cpu.memory) + la_instruction.label-1; // Use Fixed Address &cpu.memory to convert to absolute address
+    *la_instruction.Rdest = (cpu.pc - ABSOLUTE_BASE_ADDRESS(cpu)) + ACCOUNT_FOR_INCREMENTED_PC(la_instruction.label); // Use Fixed Address &cpu.memory to convert to absolute address
 }
 
 void LB(const int32_t instruction, MIPSCPU& cpu)
 {
     const LB_Instruction lb_instruction = BinaryParser::PARSE_LB(instruction, cpu);
-    *lb_instruction.Rdest = *(char*)((int32_t*)&cpu.memory + *(lb_instruction.Rsrc1 + lb_instruction.offset));
+    *lb_instruction.Rdest = *(char*)(ABSOLUTE_BASE_ADDRESS(cpu) + *(lb_instruction.Rsrc1 + lb_instruction.offset));
 }
 
 void LI(const int32_t instruction, MIPSCPU& cpu)
@@ -149,12 +138,11 @@ void SUBI(const int32_t instruction, MIPSCPU& cpu)
     *subi_instruction.Rdest = *subi_instruction.Rsrc1 - subi_instruction.Imm;
 }
 
-
 namespace // SYSCALL HELPERS
 {
     void printStringAtAddress(const int32_t* address, MIPSCPU& cpu)
     {
-        std::string* ptr = (std::string*)((int32_t*)&cpu.memory + (*address));
+        std::string* ptr = (std::string*)(ABSOLUTE_BASE_ADDRESS(cpu) + (*address));
         std::cout << *ptr << std::endl;
     }
 
@@ -169,7 +157,7 @@ namespace // SYSCALL HELPERS
     void storeStringIntoAddress(const int32_t* address, MIPSCPU& cpu)
     {
         const char* input_string = getInputString().c_str();
-        int32_t* space_allocated = (int32_t*)((int32_t*)&cpu.memory + (*address));
+        int32_t* space_allocated = ABSOLUTE_BASE_ADDRESS(cpu) + *address;
         while (*input_string != '\0') { // Iterate each char of input string and store them to previously allocated address
             *space_allocated = *input_string;
             space_allocated++; 
@@ -178,17 +166,21 @@ namespace // SYSCALL HELPERS
     }
 }
 
+constexpr const int PRINT_STRING_CODE  = 4;
+constexpr const int STORE_STRING_CODE  = 8;
+constexpr const int EXIT_CODE          = 10;
+
 void SYSCALL(const int32_t instruction, MIPSCPU& cpu)
 {
     const int32_t* $v0 = cpu.registerMap[RegisterTable::getRegister("$v0")];
     const int32_t* $a0 = cpu.registerMap[RegisterTable::getRegister("$a0")];
-    if (*$v0 == 4) {
+    if (*$v0 == PRINT_STRING_CODE) {
         printStringAtAddress($a0, cpu);
     }
-    if (*$v0 == 8) {
+    if (*$v0 == STORE_STRING_CODE) {
         storeStringIntoAddress($a0, cpu);
     }
-    if (*$v0 == 10) {
+    if (*$v0 == EXIT_CODE) {
         exit(EXIT_SUCCESS);
     }
 }

@@ -7,11 +7,11 @@
 #define LABEL_IDENTIFIER        ':'
 #define REMOVE_LAST_CHAR(string) string.substr(0, string.size()-1)
 
-constexpr const char* ASCII_IDENTIFIER   = "\".asciiz\"";
-constexpr const char* BYTES_IDENTIFER    = "\".space\"";
-constexpr const char* COMMENT_IDENTIFIER = "#";
+constexpr const char* ASCII_IDENTIFIER       = "\".asciiz\"";
+constexpr const char* BYTES_IDENTIFER        = "\".space\"";
+constexpr const char* COMMENT_IDENTIFIER     = "#";
 constexpr const char* INVALID_OPTION_MESSAGE = "%s is Not a Valid Data Section Identifier";
-constexpr const int JUST_LABEL = 1;
+constexpr const int   JUST_LABEL             = 1;
 
 namespace
 {
@@ -31,7 +31,7 @@ namespace
         const int size = std::stoi(word);
         char* entry = (char*)malloc(size + 1);  // Allocate memory for 'size' characters and a null-terminator
         char* ptr = entry;
-        for (int i = 0; i < size; i++) { // Corrected the loop condition
+        for (int i = 0; i < size; i++) {        // Set all characters to null
             *ptr++ = '\0';
         }
         return (void*)entry;
@@ -91,7 +91,7 @@ int32_t* FirstPass::addSymbolTableEntryIfNecessary(int32_t* LOCCTR, Memory& memo
     const std::string firstWord = getFirstWordOfLine(trimComments(line));
     if (firstWord.back() == LABEL_IDENTIFIER) {
         if (countWords(trimComments(line)) == JUST_LABEL) {
-            handleTextLabel(firstWord, LOCCTR, memory);
+             handleTextLabel(firstWord, LOCCTR, memory);
         }
         else {
             handleDataLabel(firstWord, trimComments(line), memory);

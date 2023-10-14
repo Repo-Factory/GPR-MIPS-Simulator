@@ -1,15 +1,21 @@
 #include "binary_parser.hpp"
 
-constexpr const int IMMEDIATE_BITS    = 16;
-constexpr const int OFFSET_BITS       = 16;
-constexpr const int REGISTER_BITS     = 5; 
+constexpr const int BIT                 = 1;
+constexpr const int INSTRUCTION_SIZE    = 32;
+constexpr const int OPCODE_BITS         = 6; 
+constexpr const int IMMEDIATE_BITS      = 16;
+constexpr const int OFFSET_BITS         = 16;
+constexpr const int REGISTER_BITS       = 5; 
+constexpr const int NON_OPCODE_BITS     = INSTRUCTION_SIZE-OPCODE_BITS;
 
-namespace
+int32_t xOnes(const int x) // Generate Bit Stream of X number of Ones
 {
-    int32_t xOnes(const int x) // Generate Bit Stream of X number of Ones
-    {
-        return ((1 << x) - 1);
-    }
+    return ((BIT << x) - 1); // -1 flips all bits behind the 1
+}
+
+int32_t BinaryParser::extractOpcode(const int32_t instruction)
+{
+    return (instruction >> NON_OPCODE_BITS);
 }
 
 /* 

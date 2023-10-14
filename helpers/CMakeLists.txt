@@ -11,7 +11,6 @@ add_library(
     helpers 
     ${SRC_DIR}/helpers/src/debug_helpers.cpp
     ${SRC_DIR}/helpers/src/file_handling_helpers.cpp
-    ${SRC_DIR}/helpers/src/bit_operations.cpp
 )
 
 target_include_directories(

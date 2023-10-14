@@ -11,9 +11,9 @@
 #include <algorithm>
 #include <iostream>
 
-using Name = std::string;
-using Opcode = int32_t;
-using Register_Id = int32_t;
+using Name          = std::string;
+using Opcode        = int32_t;
+using Register_Id   = int32_t;
 
 std::string toUpper(const std::string& str)
 {

@@ -8,6 +8,7 @@
 
 namespace BinaryParser
 {
+    int32_t             extractOpcode(const int32_t instruction);
     ADDI_Instruction    PARSE_ADDI  (const int32_t instruction, MIPSCPU& cpu);
     B_Instruction       PARSE_B     (const int32_t instruction, MIPSCPU& cpu);
     BEQZ_Instruction    PARSE_BEQZ  (const int32_t instruction, MIPSCPU& cpu);
