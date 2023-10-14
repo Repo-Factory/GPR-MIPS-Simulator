@@ -84,7 +84,7 @@ namespace
     }
 }
 
-int32_t* FirstPass::addSymbolTableEntryIfNecessary(int32_t* LOCCTR, Memory& memory, const std::string& line)
+int32_t* SymbolTable::addSymbolTableEntryIfNecessary(int32_t* LOCCTR, Memory& memory, const std::string& line)
 {
     const std::string firstWord = getFirstWordOfLine(trimComments(line));
     if (firstWord.back() == LABEL_IDENTIFIER) {

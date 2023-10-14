@@ -77,7 +77,7 @@ void executeInstruction(MIPSCPU& cpu);
 enum class FunctionalUnits
 {
 
-        InstructionMemory               = 0, 
+    InstructionMemory               = 0, 
     RegisterFileRead                = 1, 
     ALU                             = 2, 
     Data                            = 3, 

@@ -8,8 +8,6 @@
 #define USER_DATA_SIZE 1024
 #define KERNEL_DATA_SIZE 512
 
-using SymbolTable = std::map<std::string, void*>;
-
 /* Lays out 4 sections of memory
  * Each section can be accessed by its corresponding pointer field
  * Symbol table will map labels like C: to its corresponding address where the value is held
@@ -24,7 +22,7 @@ struct Memory
     int32_t* kernelDataPtr = kernelData;
     int32_t* kernelTextPtr = kernelText;
     int32_t* userDataPtr = userData;
-    SymbolTable symbol_table;           // Map symbol bit stream to address
+    std::map<std::string, void*> symbol_table;           // Map symbol bit stream to address
 };
 
 int32_t readContents(int32_t* address);

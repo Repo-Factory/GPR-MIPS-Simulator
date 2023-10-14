@@ -35,7 +35,7 @@ target_include_directories(
 )
 
 add_definitions(-DASSEMBLY_PATH="${SRC_DIR}/palindrome.s")
-add_definitions(-DDEBUG)
+# add_definitions(-DDEBUG)
 
 # Link to helpers code
 target_link_libraries(gpr
