@@ -10,7 +10,7 @@
 
 /* Lays out 4 sections of memory
  * Each section can be accessed by its corresponding pointer field
- * Symbol table will map labels like C: to its corresponding address where the value is held
+ * Symbol table will map labels like label: to its corresponding address where the value is held
  */
 struct Memory 
 {
@@ -22,7 +22,7 @@ struct Memory
     int32_t* kernelDataPtr = kernelData;
     int32_t* kernelTextPtr = kernelText;
     int32_t* userDataPtr = userData;
-    std::map<std::string, void*> symbol_table;           // Map symbol bit stream to address
+    std::map<std::string, void*> symbol_table;           // Map symbol to address
 };
 
 int32_t readContents(int32_t* address);

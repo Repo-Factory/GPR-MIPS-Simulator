@@ -31,30 +31,6 @@ void printBinary(int32_t num)
     std::cout << std::endl;
 }
 
-int sumArray(const int* array, const int size)
-{
-    int sum = 0;
-    for (int i=0; i<size; i++) {
-        sum += *(array + i);
-    }
-    return sum;
-}          
-
-// Add one array on top of another
-void overlayArrays(int* targetArray, const int* sourceArray, const int size)
-{
-    for (int i=0; i<size; i++) {
-        *(targetArray + i) += *(sourceArray + i);
-    }
-}
-
-void forEachItem(const int* array, const int size, std::function<void(int, int)> action)
-{
-    for (int i=0; i<size; i++) {
-        action(*(array+i), i);
-    }
-}
-
 // void debugPrint(Memory& memory)
 // {
 //     for (int i = 0; i < 256; ++i) {

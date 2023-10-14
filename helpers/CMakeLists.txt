@@ -11,12 +11,12 @@ add_library(
     helpers 
     ${SRC_DIR}/helpers/src/debug_helpers.cpp
     ${SRC_DIR}/helpers/src/file_handling_helpers.cpp
+    ${SRC_DIR}/helpers/src/array_helpers.cpp
 )
 
 target_include_directories(
     helpers PUBLIC 
     ${SRC_DIR}/helpers/include
-    ${SRC_DIR}/accumulator/include
 )
 
 # Install the executable

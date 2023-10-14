@@ -11,7 +11,7 @@
 #include "stdlib.h"
 #include "cpu.hpp"
 #include "memory.hpp"
-#include "debug_helpers.hpp"
+#include "array_helpers.hpp"
 #include "instructions.hpp"
 #include "binary_parser.hpp"
 #include <iostream>
@@ -20,7 +20,7 @@
 #define NUM_FUNCTIONAL_UNITS 5
 #define NUM_INSTRUCTIONS     10
 
-const int cycleTable[NUM_INSTRUCTIONS][NUM_FUNCTIONAL_UNITS]
+constexpr const int cycleTable[NUM_INSTRUCTIONS][NUM_FUNCTIONAL_UNITS]
 {   // InstructionMemory     RegisterFileRead       ALU     DataMemory      RegisterFileWrite
     {          2,                   1,               2,          0,                 1           },  // ADDI 
     {          2,                   0,               2,          0,                 0           },  // B

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef LOADER_H
+#define LOADER_H
+
 #include "memory.hpp"
 
 class Loader
@@ -15,3 +17,5 @@ namespace SymbolTable
 {
     void addSymbolTableEntryIfNecessary(int32_t* LOCCTR, Memory& memory, const std::string& line);
 }
+
+#endif

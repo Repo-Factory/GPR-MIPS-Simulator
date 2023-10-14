@@ -1,35 +1,36 @@
 /*******************************************************************************
  * @author Conner Sommerfield
- * @name accumulator
+ * @name gprSim
  * 
  * @details Reads instructions from assembly file and simulates execution 
  * 
  * Program does not require command line arguments but path to a valid text file must be defined in CMakeLists.txt 
  * 
- * Relevant entities
- * - CPU
- * - Memory
+ * Relevant entities     - Program can be thought of in two major stages; loading and executing
  * - Loader
+ *      - Source Parser - Parse assembly 
+ *      - Encoder       - Encode instructions as binary
+ *      - Symbol Table  - Handle labels
+ * - Processor
+ *      - Memory        - Simple memory access functions
+ *      - Instructions  - Defines specification for opcodes
+ *      - Binary Parser - Splits binary commands into useable pieces
+ *      - CPU           - Simulates actions using registers
  * - Helpers
  * See cpp file of each for more details in each respective area
  ******************************************************************************/
 
 #include "cpu.hpp"
 #include "loader.hpp"
-#include "memory.hpp"
 #include <memory>
-#include <fstream>
-#include <iostream>
 
-#ifndef ASSEMBLY_PATH
-    constexpr const char* ASSEMBLY_PATH = "palindrome.s";             // Default path
-#endif
+constexpr const int ASSEMBLY_PATH_INDEX = 1;
 
-/* Load instructions into memory and execute instructions forever (will stop when END command reached) */
-int main() {
+/* Load instructions into memory and execute instructions forever (will stop when sycall called with appropriate argument) */
+int main(int argc, char* argv[]) {
     std::unique_ptr<Loader> loader = std::make_unique<Loader>();
     std::unique_ptr<MIPSCPU> cpu = std::make_unique<MIPSCPU>();
-    loader->loadProgram(cpu->memory, ASSEMBLY_PATH);             // defined in CMakeLists.txt
+    loader->loadProgram(cpu->memory, argv[ASSEMBLY_PATH_INDEX]);                   // First Command line arg will be assembly path
 
     cpu->userMode = true;
     while (cpu->userMode) {

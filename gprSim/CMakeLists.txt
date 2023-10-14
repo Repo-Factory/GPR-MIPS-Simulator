@@ -34,7 +34,7 @@ target_include_directories(
     include/processor
 )
 
-add_definitions(-DASSEMBLY_PATH="${SRC_DIR}/palindrome.s")
+add_definitions(-DASSEMBLY_PATH="${SRC_DIR}/assembly.s")
 # add_definitions(-DDEBUG)
 
 # Link to helpers code
