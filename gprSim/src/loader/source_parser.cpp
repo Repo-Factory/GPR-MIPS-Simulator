@@ -84,7 +84,7 @@ namespace
 
 int32_t Parser::parseInstruction(const std::string& next_instruction, Memory& memory, int32_t* LOCCTR)
 {
-    int current_bit = INSTRUCTION_LENGTH;     ; // If we have 32 bits to fill, we start from the 32nd leftmost bit
+    int current_bit = INSTRUCTION_LENGTH;      // If we have 32 bits to fill, we start from the 32nd leftmost bit
     int32_t instruction = ALL_ZEROES;
     iterateTokens(next_instruction, [&](const std::string& token) {
         const BitStream bit_stream = getBitStreamFromToken(current_bit, token, memory, LOCCTR);

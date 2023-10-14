@@ -74,7 +74,6 @@ int32_t Encoder::encodeOffset(const std::string& token)
 int32_t Encoder::encodeLabel(const std::string& token, Memory& memory, int32_t* LOCCTR)
 {
     const char* label_address           = (char*)memory.symbol_table[token];
-    const char* memory_address          = (char*)&memory;
     const char* LOCCTR_address          = (char*)LOCCTR;
     const int32_t offsetFromPC          = static_cast<int32_t>(label_address-LOCCTR_address); 
     const int32_t offsetFromPCInBytes   = offsetFromPC / BYTES_IN_ADDRESS;

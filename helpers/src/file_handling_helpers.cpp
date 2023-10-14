@@ -5,6 +5,8 @@
 #include <sstream>
 #include <string>
 #include <functional>
+    
+const std::string COMMENT_IDENTIFIER = "#";
 
 void handleFileError(std::ifstream& stream, char* file)
 {   
@@ -36,7 +38,6 @@ std::string getLine(std::ifstream& input) {
 
 void iterateTokens(const std::string& line, std::function<void(const std::string&)> performAction)
 {
-    const std::string COMMENT_IDENTIFIER = "#";
     std::istringstream tokens(line);
     std::string  token;
     while (tokens >> token)

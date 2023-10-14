@@ -40,7 +40,7 @@ namespace // Dynamic Allocations for data section entries
         const int size = std::stoi(word);
         char* entry = (char*)malloc(size + 1);  // Allocate memory for 'size' characters and a null-terminator
         char* ptr = entry;
-        for (int i = 0; i < size; i++) {        // Set all characters to null
+        for (int i = 0; i < size; i++) {        // Explicitly set all characters to null
             *ptr++ = '\0';
         }
         return (void*)entry;
@@ -49,7 +49,7 @@ namespace // Dynamic Allocations for data section entries
 
 namespace
 {
-    // Data entry in assembly looks like ------->   label ".type" data
+    // Data entry in assembly looks like ------->   label: ".type" data
     void* allocateDataEntry(const std::string& line)
     {
         std::istringstream tokens(line);// Tokenize line
