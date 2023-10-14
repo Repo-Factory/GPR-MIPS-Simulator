@@ -1,3 +1,12 @@
+/*
+ *  @brief
+ *          Assists loader with symbol mapping
+ *
+ * Every time a label is seen we have to appropriately handle and store the address it points to and allocate the necessary data
+ * at that address
+ */
+
+
 #include "loader.hpp"
 #include "debug_helpers.hpp"
 #include "file_handling_helpers.hpp"
@@ -5,7 +14,7 @@
 #include <functional>
 
 #define LABEL_IDENTIFIER        ':'
-#define REMOVE_LAST_CHAR(string) string.substr(0, string.size()-1)
+#define REMOVE_COLON(string) string.substr(0, string.size()-1)
 
 constexpr const char* ASCII_IDENTIFIER       = "\".asciiz\"";
 constexpr const char* BYTES_IDENTIFER        = "\".space\"";
@@ -13,13 +22,13 @@ constexpr const char* COMMENT_IDENTIFIER     = "#";
 constexpr const char* INVALID_OPTION_MESSAGE = "%s is Not a Valid Data Section Identifier";
 constexpr const int   JUST_LABEL             = 1;
 
-namespace
+namespace // Dynamic Allocations for data section entries
 {
     void* handleASCIIData(std::istringstream& tokens)
     {
         std::string data;
-        std::getline(tokens >> std::ws, data);
-        std::string* entry = new std::string();      // Allocate a byte for each character of string
+        std::getline(tokens >> std::ws, data);       // Store the rest of the line (which will be the string it holds) 
+        std::string* entry = new std::string();      // We have to dynamically allocate string to be accessed later during program execution
         *entry = data;
         return (void*)entry;
     }
@@ -40,9 +49,10 @@ namespace
 
 namespace
 {
+    // Data entry in assembly looks like ------->   label ".type" data
     void* allocateDataEntry(const std::string& line)
     {
-        std::istringstream tokens(line);
+        std::istringstream tokens(line);// Tokenize line
         std::string word;
         tokens >> word;                 // Skip first  which is the label
         tokens >> word;                 // Check the second word for type
@@ -74,17 +84,17 @@ namespace
 
     void handleTextLabel(const std::string& label, int32_t* LOCCTR, Memory& memory)
     {
-        memory.symbol_table.insert({REMOVE_LAST_CHAR(label), (void*)LOCCTR});
+        memory.symbol_table.insert({REMOVE_COLON(label), (void*)LOCCTR});
     }
 
     void handleDataLabel(const std::string& label, const std::string& line, Memory& memory)
     {
-        void* entry = allocateDataEntry(line);
-        if (entry) memory.symbol_table.insert({REMOVE_LAST_CHAR(label), entry});
+        memory.symbol_table.insert({REMOVE_COLON(label), allocateDataEntry(line)});
     }
 }
 
-int32_t* SymbolTable::addSymbolTableEntryIfNecessary(int32_t* LOCCTR, Memory& memory, const std::string& line)
+/* If a label is found, adds it to the table accordingly based on if its a text or data section label */
+void SymbolTable::addSymbolTableEntryIfNecessary(int32_t* LOCCTR, Memory& memory, const std::string& line)
 {
     const std::string firstWord = getFirstWordOfLine(trimComments(line));
     if (firstWord.back() == LABEL_IDENTIFIER) {
@@ -95,6 +105,5 @@ int32_t* SymbolTable::addSymbolTableEntryIfNecessary(int32_t* LOCCTR, Memory& me
             handleDataLabel(firstWord, trimComments(line), memory);
         }
     }
-    return LOCCTR;
 }
 

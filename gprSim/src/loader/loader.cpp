@@ -3,7 +3,7 @@
  *          Loads program into memory
  *
  * Goes through assembly file, converts each symbol to a bit stream and places them in appropriate parts of memory
- * Loader class has current address pointer to point to the correct place in memory to load next instruction
+ * Loader class has current LOCCTR pointer to point to the correct place in memory to load next instruction
  */
 
 #include "loader.hpp"
@@ -21,7 +21,7 @@
 #define INCREMENT(ptr)                  ptr+=1
 
 
-/* Reads through file, skips commented lines and loads other words into memory  */
+/* Reads through file, skips commented or label lines and loads other words into memory  */
 void iterateFile(std::ifstream& sourceCode, std::function<void(const std::string&)> performActionOnLine)
 {
     while (!sourceCode.eof()) {
@@ -54,7 +54,7 @@ void Loader::performFirstPass(Memory& memory, std::ifstream& sourceCode)
 { 
     iterateFile(sourceCode, [&](const std::string& line) {
         this->LOCCTR = updateMemorySectionIfNecessary(this->LOCCTR, memory, line);
-        this->LOCCTR = SymbolTable::addSymbolTableEntryIfNecessary(this->LOCCTR, memory, line);
+        SymbolTable::addSymbolTableEntryIfNecessary(this->LOCCTR, memory, line);
         if (Parser::isInstruction(line)) { INCREMENT(LOCCTR); }
     });
 }
@@ -67,8 +67,8 @@ void Loader::performSecondPass(Memory& memory, std::ifstream& sourceCode)
     iterateFile(sourceCode, [&](const std::string& line) {
         this->LOCCTR = updateMemorySectionIfNecessary(this->LOCCTR, memory, line);
         if (Parser::isInstruction(line)) {
-            writeContents(this->LOCCTR++, Parser::parseInstruction(line, memory, this->LOCCTR)); // Place 32 bit instruction into text section
-        }
+            writeContents(this->LOCCTR++, Parser::parseInstruction(line, memory, this->LOCCTR)); 
+        }   // Place 32 bit instruction into text section
     });
 }
 

@@ -13,5 +13,5 @@ class Loader
 
 namespace SymbolTable
 {
-    int32_t* addSymbolTableEntryIfNecessary(int32_t* LOCCTR, Memory& memory, const std::string& line);
+    void addSymbolTableEntryIfNecessary(int32_t* LOCCTR, Memory& memory, const std::string& line);
 }
