@@ -4,7 +4,6 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "memory.hpp"
-#include "parser.hpp"
 
 using Register          = int32_t*;
 using IntegerIdentifier = int32_t;

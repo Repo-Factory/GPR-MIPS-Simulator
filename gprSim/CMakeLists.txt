@@ -12,7 +12,7 @@ endif()
 add_library(
   gpr
   STATIC
-  src/loader/parser.cpp
+  src/loader/source_parser.cpp
   src/loader/encoder.cpp
   src/loader/loader.cpp
   src/loader/symbol_table.cpp

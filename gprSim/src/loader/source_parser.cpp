@@ -17,7 +17,7 @@
 
 #include "stdio.h"
 #include "stdlib.h"
-#include "parser.hpp"
+#include "source_parser.hpp"
 #include "encoder.hpp"
 #include "debug_helpers.hpp"
 #include "file_handling_helpers.hpp"

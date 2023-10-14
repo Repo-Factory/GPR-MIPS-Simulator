@@ -9,7 +9,7 @@
 #include "loader.hpp"
 #include "debug_helpers.hpp"
 #include "file_handling_helpers.hpp"
-#include "parser.hpp"
+#include "source_parser.hpp"
 #include <functional>
 #include <iostream>
 
