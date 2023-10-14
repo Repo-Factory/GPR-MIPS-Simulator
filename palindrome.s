@@ -36,7 +36,7 @@ length_loop:			# length of the string
 	b length_loop		# and repeat the loop.
 
 end_length_loop:
-	subi $t2, $t2, 2	# subtract 2 to move B back past
+	subi $t2, $t2, 1	# subtract 2 to move B back past
 
 # the '\0' and '\n'.
 
@@ -74,4 +74,4 @@ exit:				# exit the program
 	.data
 is_palin_msg: ".asciiz" "The string is a palindrome.\n"
 not_palin_msg: ".asciiz" "The string is not a palindrome.\n"
-string_space:  ".space" 1024	# reserve 1024 bytes for the string.
+string_space:  ".space" 1024	# reserve 1024 bytes for the string.end_length_loop

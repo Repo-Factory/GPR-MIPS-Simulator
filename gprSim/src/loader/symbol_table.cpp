@@ -28,10 +28,15 @@ namespace
     {
         std::string word;
         tokens >> word;
-        void* entry = (void*)malloc(std::stoi(word) * sizeof(char));   // Allocate number of bytes indicated
-        std::string* string_ptr = (std::string*)entry;
-        *string_ptr = "default";
-        return (void*)(string_ptr);
+        const int size = std::stoi(word);
+        char* entry = (char*)malloc(size + 1);  // Allocate memory for 'size' characters and a null-terminator
+        char* ptr = entry;
+        for (int i = 0; i < size; i++) { // Corrected the loop condition
+            *ptr++ = '\0';
+        }
+        return (void*)entry;
+   
+
     }
 }
 

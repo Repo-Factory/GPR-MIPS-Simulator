@@ -16,9 +16,12 @@
 #include "binary_parser.hpp"
 #include <iostream>
 
+#define ACCOUNT_FOR_ADVANCED_PC(number) number-1
+
 constexpr const int INSTRUCTION_SIZE    = 32;
 constexpr const int OPCODE_BITS         = 6; 
 constexpr const int NON_OPCODE_BITS     = INSTRUCTION_SIZE-OPCODE_BITS;
+
 
 int CycleTable[10][5] = 
 {
@@ -125,14 +128,15 @@ void BNE(const int32_t instruction, MIPSCPU& cpu)
 void LA(const int32_t instruction, MIPSCPU& cpu)
 {
     const LA_Instruction la_instruction = BinaryParser::PARSE_LA(instruction, cpu);
-    *la_instruction.Rdest = la_instruction.label-1;
+    *la_instruction.Rdest = (cpu.pc - (int32_t*)&cpu.memory) + la_instruction.label-1; // Use Fixed Address &cpu.memory to convert to absolute address
 }
 
 void LB(const int32_t instruction, MIPSCPU& cpu)
 {
     const LB_Instruction lb_instruction = BinaryParser::PARSE_LB(instruction, cpu);
-    *lb_instruction.Rdest = *(cpu.pc + *(lb_instruction.Rsrc1 + lb_instruction.offset));
-    std::cout << "Byte at address: " << cpu.pc+*lb_instruction.Rsrc1 << " " << *(cpu.pc + *(lb_instruction.Rsrc1 + lb_instruction.offset)) << std::endl;
+    *lb_instruction.Rdest = *(char*)((int32_t*)&cpu.memory + *(lb_instruction.Rsrc1 + lb_instruction.offset));
+    std::cout << "Register Value: " << *lb_instruction.Rdest;
+    std::cout << *(char*)((int32_t*)&cpu.memory + *(lb_instruction.Rsrc1 + lb_instruction.offset)) << std::endl;
 }
 
 void LI(const int32_t instruction, MIPSCPU& cpu)
@@ -154,14 +158,19 @@ void SYSCALL(const int32_t instruction, MIPSCPU& cpu)
     std::string input;
 
     if (*$v0 == 4) {
-        std::string* ptr = (std::string*)(cpu.pc + (*$a0-2));
+        std::string* ptr = (std::string*)((int32_t*)&cpu.memory + (*$a0));
         std::cout << *ptr << std::endl;
     }
     if (*$v0 == 8) {
         printf("Please Enter A String To Check If It Is A Palindrome: ");
         std::cin >> input;
-        std::string* ptr = (std::string*)(cpu.pc + (*$a0-3));
-        *ptr = input;
+        const char* c_string = input.c_str();
+        int32_t* input_bytes = (int32_t*)((int32_t*)&cpu.memory + (*$a0));
+        while (*c_string != '\0') {
+            *input_bytes = *c_string;
+            input_bytes++; 
+            c_string++;
+        }
     }
     if (*$v0 == 10) {
         exit(EXIT_SUCCESS);
