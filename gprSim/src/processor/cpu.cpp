@@ -108,6 +108,7 @@ void ADDI(const int32_t instruction, MIPSCPU& cpu)
     *addi_instruction.Rdest = *addi_instruction.Rsrc1 + addi_instruction.Imm;
 }
 
+// For branch instructions we can move the PC by the offset indicated in the label
 void B(const int32_t instruction, MIPSCPU& cpu)
 {
     const B_Instruction b_instruction = BinaryParser::PARSE_B(instruction, cpu);
@@ -138,12 +139,18 @@ void BNE(const int32_t instruction, MIPSCPU& cpu)
     }
 }
 
+// Here the label that was stored is relative to the pc counter. However, we have to store an absolute address because
+// if we jump from the PC the offset will have changed at a new instruction. We can use the absolute base address to 
+// jump from an absolute reference point. However, we don't explicitly know how far the target is from the absolute base address.
+// We do know how far it is from the PC. So we can find how far the pc is from the base address, add that to how far the address
+// is from the PC (stored in the label), and we will have the distance from the absolute base address stored in the register
 void LA(const int32_t instruction, MIPSCPU& cpu)
 {
     const LA_Instruction la_instruction = BinaryParser::PARSE_LA(instruction, cpu);
-    *la_instruction.Rdest = (cpu.pc - ABSOLUTE_BASE_ADDRESS(cpu)) + ACCOUNT_FOR_INCREMENTED_PC(la_instruction.label); // Use Fixed Address &cpu.memory to convert to absolute address
-}
+    *la_instruction.Rdest = (cpu.pc - ABSOLUTE_BASE_ADDRESS(cpu)) + ACCOUNT_FOR_INCREMENTED_PC(la_instruction.label); 
+}   // Use Fixed Address &cpu.memory to convert to absolute address.
 
+// Here we want to dereference a byte of data that is found out a certain distance from the source register.
 void LB(const int32_t instruction, MIPSCPU& cpu)
 {
     const LB_Instruction lb_instruction = BinaryParser::PARSE_LB(instruction, cpu);
@@ -174,8 +181,9 @@ constexpr const char* WRITE_MODE =                            "w";
 constexpr const char* OUTPUT_MESSAGE =                        "Instructions Executed: %d\nTotal Cycles: %d\nSpeed Up: %f";
 
 constexpr const int SPEEDUP_CONSTANT =                        8;
-constexpr const float SPEEDUP(const int IC, const int C) {return SPEEDUP_CONSTANT * ((float)IC/(float)C);}
+constexpr const float SPEEDUP(const int IC, const int C)      {return SPEEDUP_CONSTANT * ((float)IC/(float)C);}
 
+// Print statistics and exit CPU loop
 void exitProcedure(MIPSCPU& cpu)
 {
     cpu.userMode = false;

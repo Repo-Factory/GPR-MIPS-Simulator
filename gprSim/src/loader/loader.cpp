@@ -20,6 +20,18 @@
 #define FIRST_CHAR(line)                line[0]
 #define INCREMENT(ptr)                  ptr+=1
 
+void debugPrint(Memory& memory)
+{
+    std::cout << "_______________ INSTRUCTIONS ______________" << std::endl;
+    for (int i = 0; i < 32; ++i) {
+        std::cout << "Memory[" << i << "]: "; printBinary(*((int32_t*)&memory + i));
+    }  std::cout << "_______________ INSTRUCTIONS ______________"  << std::endl;
+    std::cout << std::endl << "________________ SYMBOL TABLE  _____________" << std::endl;
+    std::cout << memory.symbol_table;
+    std::cout << "________________ SYMBOL TABLE  _____________" << std::endl;
+    std::cout << std::endl;
+}
+
 
 /* Reads through file, skips commented or label lines and loads other words into memory  */
 void iterateFile(std::ifstream& sourceCode, std::function<void(const std::string&)> performActionOnLine)
@@ -86,4 +98,7 @@ void Loader::loadProgram(Memory& memory, const char* assemblyPath)
 {
     handlePass(assemblyPath, [&](std::ifstream& sourceCode){this->performFirstPass(memory, sourceCode);});
     handlePass(assemblyPath, [&](std::ifstream& sourceCode){this->performSecondPass(memory, sourceCode);});
+    #ifdef DEBUG
+        debugPrint(memory);
+    #endif
 }

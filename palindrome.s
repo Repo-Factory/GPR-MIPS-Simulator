@@ -36,9 +36,9 @@ length_loop:			# length of the string
 	b length_loop		# and repeat the loop.
 
 end_length_loop:
-	subi $t2, $t2, 1	# subtract 2 to move B back past
+	subi $t2, $t2, 1	# subtract 1 to move B back past
 
-# the '\0' and '\n'.
+# the '\0'.
 
 test_loop:
 	bge $t1, $t2, is_palin	# if A >= B, it's a palindrome.

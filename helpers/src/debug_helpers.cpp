@@ -35,9 +35,6 @@ void printBinary(int32_t num)
 // {
 //     for (int i = 0; i < 256; ++i) {
 //         std::cout << "Memory[" << i << "]: "; printBinary(*((int32_t*)&memory + i));
-//     }
-//     int32_t* ptr = (int32_t*)&memory+5648;
-//     std::cout << *(std::string*)ptr << std::endl;
-//     std::cout << *(std::string*)memory.symbol_table["is_palin_msg"] << std::endl;
+//     }//    
 //     std::cout << memory.symbol_table;
 // }

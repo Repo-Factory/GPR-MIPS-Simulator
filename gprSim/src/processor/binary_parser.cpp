@@ -43,7 +43,7 @@ ADDI_Instruction BinaryParser::PARSE_ADDI(const int32_t instruction, MIPSCPU& cp
 
 B_Instruction BinaryParser::PARSE_B(const int32_t instruction, MIPSCPU& cpu)
 {
-    const int32_t label               = (((instruction >> 0 & xOnes(26)) << 6) >> 6);
+    const int32_t label               = (((instruction >> 0 & xOnes(26)) << 6) >> 6);   // Correct for signedness
     return B_Instruction              {label};
 }
 
