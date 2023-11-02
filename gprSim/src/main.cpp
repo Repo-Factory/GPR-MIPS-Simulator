@@ -30,8 +30,8 @@ int main(int argc, char* argv[]) {
         const char* ASSEMBLY_PATH = argv[1];
     #endif
 
-    std::unique_ptr<Loader> loader = std::make_unique<Loader>();
-    std::unique_ptr<MIPSCPU> cpu = std::make_unique<MIPSCPU>();
+    const auto loader = std::make_unique<Loader>();
+    const auto cpu = std::make_unique<MIPSCPU>();
     loader->loadProgram(cpu->memory, ASSEMBLY_PATH);                   // First Command line arg will be assembly path
 
     cpu->userMode = true;

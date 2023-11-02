@@ -6,5 +6,5 @@
 
 std::function<int*(bool, const int*)> cyclesPerUnitClosure();
 std::function<std::vector<std::vector<int>>()> cyclesTableClosure();
-const std::function<std::vector<std::string>()> functionalUnitsClosure();
+const std::function<std::vector<std::string>()> functionalUnitsNamesClosure();
 const std::function<int(bool)> instructionsExecutedClosure();

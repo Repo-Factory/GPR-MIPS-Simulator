@@ -16,7 +16,7 @@ std::function<std::vector<std::vector<int>>()> cyclesTableClosure()
 {
     const std::vector<std::vector<int>> cycleTable
     {   // InstructionMemory     RegisterFileRead       ALU     DataMemory      RegisterFileWrite
-        {          0,                   0,               0,          0,                 0           },   // NOP
+        {          0,                   0,               0,          0,                 0           },  // NOP
         {          2,                   1,               2,          0,                 1           },  // ADDI 
         {          2,                   0,               2,          0,                 0           },  // B
         {          2,                   1,               2,          0,                 0           },  // BEQZ
@@ -33,7 +33,7 @@ std::function<std::vector<std::vector<int>>()> cyclesTableClosure()
     };
 }
 
-const std::function<std::vector<std::string>()> functionalUnitsClosure()
+const std::function<std::vector<std::string>()> functionalUnitsNamesClosure()
 {
     const std::vector<std::string> functionalUnits 
     {

@@ -5,11 +5,16 @@
 #include "stdlib.h"
 #include "memory.hpp"
 #include "cycles.hpp"
+#include "pipeline.hpp"
 #include <functional>
 
 using Register          = int32_t*;
 using IntegerIdentifier = int32_t;
 using RegisterMap       = std::map<IntegerIdentifier, Register>;
+using IntArrayF         = std::function<int*(bool, const int*)>;
+using IntMatrixF        = std::function<std::vector<std::vector<int>>()>;
+using StringArrayF      = std::function<std::vector<std::string>()>;
+using IntF              = std::function<int(bool)>;
 
 struct MIPSCPU // CPU has memory and registers (in this case accumulator & program counter) 
 {
@@ -48,10 +53,6 @@ struct MIPSCPU // CPU has memory and registers (in this case accumulator & progr
     int32_t* $29 =  new int32_t();               // (sp)
     int32_t* $30 =  new int32_t();               // (fp)
     int32_t* $31 =  new int32_t();               // (ra)
-    const std::function<int*(bool, const int*)> cyclesPerUnit = cyclesPerUnitClosure();
-    const std::function<std::vector<std::vector<int>>()> cyclesTable = cyclesTableClosure();
-    const std::function<std::vector<std::string>()> functionalUnits = functionalUnitsClosure();
-    const std::function<int(bool)> instructionsExecuted = instructionsExecutedClosure();
     RegisterMap registerMap
     {
         {0, $0},      {1, $1},      {2, $2},      {3, $3},     
@@ -63,6 +64,9 @@ struct MIPSCPU // CPU has memory and registers (in this case accumulator & progr
         {24, $24},    {25, $25},    {26, $26},    {27, $27},    
         {28, $28},    {29, $29},    {30, $30},    {31, $31},    
     };
+    const IntArrayF cyclesPerUnit = cyclesPerUnitClosure();
+    const IntF instructionsExecuted = instructionsExecutedClosure();
+    PipelineLatches latches;
 };
 
 /* Functions which implement each instruction in simulator */
