@@ -1,0 +1,3 @@
+Instructions Executed: 34
+Total Cycles: 179
+Speed Up: 1.519553

@@ -4,6 +4,8 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "memory.hpp"
+#include "cycles.hpp"
+#include <functional>
 
 using Register          = int32_t*;
 using IntegerIdentifier = int32_t;
@@ -12,10 +14,8 @@ using RegisterMap       = std::map<IntegerIdentifier, Register>;
 struct MIPSCPU // CPU has memory and registers (in this case accumulator & program counter) 
 {
     Memory memory;
-    bool userMode            = false;
-    int32_t* pc              = memory.userTextPtr;
-    int instructionsExecuted = 0;
-    int totalCycles          = 0;
+    bool userMode = false;
+    int32_t* pc = memory.userTextPtr;
     int32_t* $0 =   new int32_t();               // (zero)
     int32_t* $1 =   new int32_t();               // (at)
     int32_t* $2 =   new int32_t();               // (v0)
@@ -48,6 +48,10 @@ struct MIPSCPU // CPU has memory and registers (in this case accumulator & progr
     int32_t* $29 =  new int32_t();               // (sp)
     int32_t* $30 =  new int32_t();               // (fp)
     int32_t* $31 =  new int32_t();               // (ra)
+    const std::function<int*(bool, const int*)> cyclesPerUnit = cyclesPerUnitClosure();
+    const std::function<std::vector<std::vector<int>>()> cyclesTable = cyclesTableClosure();
+    const std::function<std::vector<std::string>()> functionalUnits = functionalUnitsClosure();
+    const std::function<int(bool)> instructionsExecuted = instructionsExecutedClosure();
     RegisterMap registerMap
     {
         {0, $0},      {1, $1},      {2, $2},      {3, $3},     

@@ -20,16 +20,17 @@
 
 enum class Instruction               // OpCode Mappings
 {
-    ADDI                            = 0,
-    B                               = 1,
-    BEQZ                            = 2,
-    BGE                             = 3,
-    BNE                             = 4,
-    LA                              = 5,
-    LB                              = 6,
-    LI                              = 7,
-    SUBI                            = 8,
-    SYSCALL                         = 9
+    NOP                             = 0,
+    ADDI                            = 1,
+    B                               = 2,
+    BEQZ                            = 3,
+    BGE                             = 4,
+    BNE                             = 5,
+    LA                              = 6,
+    LB                              = 7,
+    LI                              = 8,
+    SUBI                            = 9,
+    SYSCALL                         = 10
 };
 
 struct ADDI_Instruction

@@ -20,6 +20,8 @@ add_library(
   src/processor/instructions.cpp
   src/processor/cpu.cpp
   src/processor/memory.cpp
+  src/processor/pipeline.cpp
+  src/processor/cycles.cpp
 )
 
 # Add package's source files

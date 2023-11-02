@@ -14,82 +14,14 @@
 #include "array_helpers.hpp"
 #include "instructions.hpp"
 #include "binary_parser.hpp"
+#include "pipeline.hpp"
+#include "cycles.hpp"
 #include <iostream>
-
-#define ALL_ZEROES           0
-#define NUM_FUNCTIONAL_UNITS 5
-#define NUM_INSTRUCTIONS     10
-
-constexpr const int cycleTable[NUM_INSTRUCTIONS][NUM_FUNCTIONAL_UNITS]
-{   // InstructionMemory     RegisterFileRead       ALU     DataMemory      RegisterFileWrite
-    {          2,                   1,               2,          0,                 1           },  // ADDI 
-    {          2,                   0,               2,          0,                 0           },  // B
-    {          2,                   1,               2,          0,                 0           },  // BEQZ
-    {          2,                   1,               2,          0,                 0           },  // BGE
-    {          2,                   1,               2,          0,                 0           },  // BNE
-    {          2,                   0,               2,          0,                 2           },  // LA
-    {          2,                   1,               2,          0,                 1           },  // LB
-    {          2,                   0,               0,          0,                 1           },  // LI
-    {          2,                   1,               2,          0,                 1           },  // SUBI
-    {          2,                   1,               2,          2,                 1           }   // SYSCALL
-};
-
-const std::string functionalUnits[NUM_FUNCTIONAL_UNITS] 
-{
-    "InstructionMemory" ,"RegisterFileRead" ,"ALU" ,"DataMemory" ,"RegisterFileWrite"
-};
-
-int cyclesPerUnit[NUM_FUNCTIONAL_UNITS] 
-{
-    ALL_ZEROES   // Init Cycles for each functional unit to be 0
-};
-
-/* Called in loop from main to run program */
-void executeInstruction(MIPSCPU& cpu) 
-{
-    const int32_t instruction = readContents(cpu.pc++);
-    const int32_t opcode = BinaryParser::extractOpcode(instruction);
-    switch ((opcode)) // Read instruction at PC and increment PC after             
-    {
-        case ADDI_OPCODE():
-             ADDI(instruction, cpu);
-             break;
-        case B_OPCODE():
-             B(instruction, cpu);
-             break;
-        case BEQZ_OPCODE():
-             BEQZ(instruction, cpu);
-             break;
-        case BGE_OPCODE():
-             BGE(instruction, cpu);
-             break;
-        case BNE_OPCODE():
-             BNE(instruction, cpu);
-             break;
-        case LA_OPCODE():
-             LA(instruction, cpu);
-             break;
-        case LB_OPCODE():
-             LB(instruction, cpu);
-             break;
-        case LI_OPCODE():
-             LI(instruction, cpu);
-             break;
-        case SUBI_OPCODE():
-             SUBI(instruction, cpu);
-             break;
-        case SYSCALL_OPCODE():
-             SYSCALL(instruction, cpu);
-             break;          
-    }
-    overlayArrays(cyclesPerUnit, cycleTable[opcode], NUM_FUNCTIONAL_UNITS); // Increment cycles of each functional unit
-    cpu.instructionsExecuted++;                                             // Incremenent total instructions executed
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 /**** These functions will manipulate values in the registers to perform calculation ****/
 ////////////////////////////////////////////////////////////////////////////////////////////
-
+#define GET 0
 #define ACCOUNT_FOR_INCREMENTED_PC(number) number-1
 
 /* 
@@ -187,19 +119,20 @@ constexpr const float SPEEDUP(const int IC, const int C)      {return SPEEDUP_CO
 void exitProcedure(MIPSCPU& cpu)
 {
     cpu.userMode = false;
-    cpu.totalCycles = sumArray(cyclesPerUnit, NUM_FUNCTIONAL_UNITS);
-    const float speedup = SPEEDUP(cpu.instructionsExecuted, cpu.totalCycles);
+    const int totalCycles = sumArray(cpu.cyclesPerUnit(GET, nullptr), NUM_FUNCTIONAL_UNITS);
+    const int instructionsExecuted = cpu.instructionsExecuted(GET);
+    const float speedup = SPEEDUP(instructionsExecuted, totalCycles);
     
-    printf(TOTAL_INSTRUCTIONS_MESSAGE, cpu.instructionsExecuted);
-    printf(TOTAL_CYCLES_MESSAGE, cpu.totalCycles);
+    printf(TOTAL_INSTRUCTIONS_MESSAGE, instructionsExecuted);
+    printf(TOTAL_CYCLES_MESSAGE, totalCycles);
     printf(SPEEDUP_MESSAGE, speedup);
     
-    forEachItem(cyclesPerUnit, NUM_FUNCTIONAL_UNITS, [&](int cycles, int index) {
-        printf(CYCLES_FOR_FUNCTIONAL_UNIT_MESSAGE, functionalUnits[index].c_str(), cycles);
+    forEachItem(cpu.cyclesPerUnit(GET, nullptr), NUM_FUNCTIONAL_UNITS, [&](int cycles, int index) {
+        printf(CYCLES_FOR_FUNCTIONAL_UNIT_MESSAGE, functionalUnitsClosure()()[index].c_str(), cycles);
     }); // Print Cycles for each functional unit
 
     FILE* output = fopen(OUTPUT_FILE, WRITE_MODE);
-    fprintf(output, OUTPUT_MESSAGE, cpu.instructionsExecuted, cpu.totalCycles, speedup);
+    fprintf(output, OUTPUT_MESSAGE, instructionsExecuted, totalCycles, speedup);
     fclose(output);
 }
 
