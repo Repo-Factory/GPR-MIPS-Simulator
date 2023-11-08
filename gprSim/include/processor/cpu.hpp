@@ -5,8 +5,10 @@
 #include "stdlib.h"
 #include "memory.hpp"
 #include "cycles.hpp"
+#include "binary_parser.hpp"
 #include "pipeline.hpp"
 #include <functional>
+#include <deque>
 
 using Register          = int32_t*;
 using IntegerIdentifier = int32_t;
@@ -18,9 +20,9 @@ using IntF              = std::function<int(bool)>;
 
 struct MIPSCPU // CPU has memory and registers (in this case accumulator & program counter) 
 {
-    Memory memory;
+    Memory          memory;
     bool userMode = false;
-    int32_t* pc = memory.userTextPtr;
+    int32_t* pc =   memory.userTextPtr;
     int32_t* $0 =   new int32_t();               // (zero)
     int32_t* $1 =   new int32_t();               // (at)
     int32_t* $2 =   new int32_t();               // (v0)
@@ -53,7 +55,7 @@ struct MIPSCPU // CPU has memory and registers (in this case accumulator & progr
     int32_t* $29 =  new int32_t();               // (sp)
     int32_t* $30 =  new int32_t();               // (fp)
     int32_t* $31 =  new int32_t();               // (ra)
-    RegisterMap registerMap
+    RegisterMap     registerMap
     {
         {0, $0},      {1, $1},      {2, $2},      {3, $3},     
         {4, $4},      {5, $5},      {6, $6},      {7, $7},    
@@ -64,24 +66,22 @@ struct MIPSCPU // CPU has memory and registers (in this case accumulator & progr
         {24, $24},    {25, $25},    {26, $26},    {27, $27},    
         {28, $28},    {29, $29},    {30, $30},    {31, $31},    
     };
-    const IntArrayF cyclesPerUnit = cyclesPerUnitClosure();
-    const IntF instructionsExecuted = instructionsExecutedClosure();
+    const IntArrayF cyclesPerUnit       = cyclesPerUnitClosure();
+    const IntF  instructionsExecuted    = instructionsExecutedClosure();
     PipelineLatches latches;
+    std::deque<Stage> pipeline;
 };
 
 /* Functions which implement each instruction in simulator */
-void ADDI(const int32_t instruction, MIPSCPU& cpu);
-void B(const int32_t instruction, MIPSCPU& cpu);
-void BEQZ(const int32_t instruction, MIPSCPU& cpu);
-void BGE(const int32_t instruction, MIPSCPU& cpu);
-void BNE(const int32_t instruction, MIPSCPU& cpu);
-void LA(const int32_t instruction, MIPSCPU& cpu);
-void LB(const int32_t instruction, MIPSCPU& cpu);
-void LI(const int32_t instruction, MIPSCPU& cpu);
-void SUBI(const int32_t instruction, MIPSCPU& cpu);
+void ADDI(const ADDI_Instruction addi_instruction);
+void B(const B_Instruction b_instruction, MIPSCPU cpu);
+void BEQZ(const BEQZ_Instruction beqz_instruction, MIPSCPU cpu);
+void BGE(const BGE_Instruction bge_instruction, MIPSCPU cpu);
+void BNE(const BNE_Instruction bne_instruction, MIPSCPU cpu);
+void LA(const LA_Instruction la_instruction, MIPSCPU cpu);
+void LB(const LB_Instruction lb_instruction, MIPSCPU cpu);
+void LI(const LI_Instruction li_instruction);
+void SUBI(const SUBI_Instruction subi_instruction);
 void SYSCALL(const int32_t instruction, MIPSCPU& cpu);
-
-/* Primary function called in loop from main to simulate machine */
-void executeInstruction(MIPSCPU& cpu);
 
 #endif

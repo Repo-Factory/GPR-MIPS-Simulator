@@ -99,11 +99,10 @@ void SymbolTable::addSymbolTableEntryIfNecessary(int32_t* LOCCTR, Memory& memory
     const std::string firstWord = getFirstWordOfLine(trimComments(line));
     if (firstWord.back() == LABEL_IDENTIFIER) {
         if (countWords(trimComments(line)) == JUST_LABEL) {
-             handleTextLabel(firstWord, LOCCTR, memory);
+            handleTextLabel(firstWord, LOCCTR, memory);
         }
         else {
             handleDataLabel(firstWord, trimComments(line), memory);
         }
     }
 }
-

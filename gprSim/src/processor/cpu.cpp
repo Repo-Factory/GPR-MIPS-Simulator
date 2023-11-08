@@ -34,38 +34,33 @@ int32_t* ABSOLUTE_BASE_ADDRESS(MIPSCPU& cpu)
     return (int32_t*)&cpu.memory;           
 }
 
-void ADDI(const int32_t instruction, MIPSCPU& cpu)
+void ADDI(const ADDI_Instruction addi_instruction)
 {
-    const ADDI_Instruction addi_instruction = BinaryParser::PARSE_ADDI(instruction, cpu);
     *addi_instruction.Rdest = *addi_instruction.Rsrc1 + addi_instruction.Imm;
 }
 
 // For branch instructions we can move the PC by the offset indicated in the label
-void B(const int32_t instruction, MIPSCPU& cpu)
+void B(const B_Instruction b_instruction, MIPSCPU cpu)
 {
-    const B_Instruction b_instruction = BinaryParser::PARSE_B(instruction, cpu);
     cpu.pc += ACCOUNT_FOR_INCREMENTED_PC(b_instruction.label);
 }
 
-void BEQZ(const int32_t instruction, MIPSCPU& cpu)
+void BEQZ(const BEQZ_Instruction beqz_instruction, MIPSCPU cpu)
 {
-    const BEQZ_Instruction beqz_instruction = BinaryParser::PARSE_BEQZ(instruction, cpu);
     if (*beqz_instruction.Rsrc1 == 0) { 
         cpu.pc+=ACCOUNT_FOR_INCREMENTED_PC(beqz_instruction.label);
     }
 }
 
-void BGE(const int32_t instruction, MIPSCPU& cpu)
+void BGE(const BGE_Instruction bge_instruction, MIPSCPU cpu)
 {
-    const BGE_Instruction bge_instruction = BinaryParser::PARSE_BGE(instruction, cpu);
     if (*bge_instruction.Rsrc1 >= *bge_instruction.Rsrc2) {
         cpu.pc+=ACCOUNT_FOR_INCREMENTED_PC(bge_instruction.label);
     }
 }
 
-void BNE(const int32_t instruction, MIPSCPU& cpu)
+void BNE(const BNE_Instruction bne_instruction, MIPSCPU cpu)
 {
-    const BNE_Instruction bne_instruction = BinaryParser::PARSE_BNE(instruction, cpu);
     if (*bne_instruction.Rsrc1 != *bne_instruction.Rsrc2) {
         cpu.pc+=ACCOUNT_FOR_INCREMENTED_PC(bne_instruction.label);
     }
@@ -76,28 +71,24 @@ void BNE(const int32_t instruction, MIPSCPU& cpu)
 // jump from an absolute reference point. However, we don't explicitly know how far the target is from the absolute base address.
 // We do know how far it is from the PC. So we can find how far the pc is from the base address, add that to how far the address
 // is from the PC (stored in the label), and we will have the distance from the absolute base address stored in the register
-void LA(const int32_t instruction, MIPSCPU& cpu)
+void LA(const LA_Instruction la_instruction, MIPSCPU cpu)
 {
-    const LA_Instruction la_instruction = BinaryParser::PARSE_LA(instruction, cpu);
     *la_instruction.Rdest = (cpu.pc - ABSOLUTE_BASE_ADDRESS(cpu)) + ACCOUNT_FOR_INCREMENTED_PC(la_instruction.label); 
 }   // Use Fixed Address &cpu.memory to convert to absolute address.
 
 // Here we want to dereference a byte of data that is found out a certain distance from the source register.
-void LB(const int32_t instruction, MIPSCPU& cpu)
+void LB(const LB_Instruction lb_instruction, MIPSCPU cpu)
 {
-    const LB_Instruction lb_instruction = BinaryParser::PARSE_LB(instruction, cpu);
     *lb_instruction.Rdest = *(char*)(ABSOLUTE_BASE_ADDRESS(cpu) + *(lb_instruction.Rsrc1 + lb_instruction.offset));
 }   // Dereferencing char pointer gives us a byte
 
-void LI(const int32_t instruction, MIPSCPU& cpu)
+void LI(const LI_Instruction li_instruction)
 {
-    const LI_Instruction li_instruction = BinaryParser::PARSE_LI(instruction, cpu);
     *li_instruction.Rdest = li_instruction.Imm;
 }
 
-void SUBI(const int32_t instruction, MIPSCPU& cpu)
+void SUBI(const SUBI_Instruction subi_instruction)
 {
-    const SUBI_Instruction subi_instruction = BinaryParser::PARSE_SUBI(instruction, cpu);
     *subi_instruction.Rdest = *subi_instruction.Rsrc1 - subi_instruction.Imm;
 }
 
@@ -128,7 +119,7 @@ void exitProcedure(MIPSCPU& cpu)
     printf(SPEEDUP_MESSAGE, speedup);
     
     forEachItem(cpu.cyclesPerUnit(GET, nullptr), NUM_FUNCTIONAL_UNITS, [&](int cycles, int index) {
-        printf(CYCLES_FOR_FUNCTIONAL_UNIT_MESSAGE, functionalUnitsClosure()()[index].c_str(), cycles);
+        printf(CYCLES_FOR_FUNCTIONAL_UNIT_MESSAGE, functionalUnitsNamesClosure()()[index].c_str(), cycles);
     }); // Print Cycles for each functional unit
 
     FILE* output = fopen(OUTPUT_FILE, WRITE_MODE);

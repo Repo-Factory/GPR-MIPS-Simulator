@@ -20,8 +20,8 @@
  * See cpp file of each for more details in each respective area
  ******************************************************************************/
 
-#include "cpu.hpp"
 #include "loader.hpp"
+#include "cpu.hpp"
 #include <memory>
 
 /* Load instructions into memory and execute instructions forever (will stop when sycall called with appropriate argument) */

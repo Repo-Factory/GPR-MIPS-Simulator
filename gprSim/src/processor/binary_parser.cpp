@@ -1,4 +1,5 @@
 #include "binary_parser.hpp"
+#include "cpu.hpp"
 
 constexpr const int BIT                 = 1;
 constexpr const int INSTRUCTION_SIZE    = 32;
