@@ -82,6 +82,6 @@ EX_Result LA(const LA_Instruction la_instruction, MIPSCPU cpu);
 EX_Result LB(const LB_Instruction lb_instruction, MIPSCPU cpu);
 EX_Result LI(const LI_Instruction li_instruction);
 EX_Result SUBI(const SUBI_Instruction subi_instruction);
-void SYSCALL(const int32_t instruction, MIPSCPU& cpu);
+void SYSCALL(MIPSCPU& cpu);
 
 #endif

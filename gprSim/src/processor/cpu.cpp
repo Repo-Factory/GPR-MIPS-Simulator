@@ -153,7 +153,7 @@ constexpr const int PRINT_STRING_CODE  = 4;
 constexpr const int STORE_STRING_CODE  = 8;
 constexpr const int EXIT_CODE          = 10;
 
-void SYSCALL(const int32_t instruction, MIPSCPU& cpu)
+void SYSCALL(MIPSCPU& cpu)
 {
     const int32_t* $v0 = cpu.registerMap[RegisterTable::getRegister("$v0")];
     const int32_t* $a0 = cpu.registerMap[RegisterTable::getRegister("$a0")];

@@ -10,6 +10,8 @@
 #include <deque>
 #include <cstdint>
 #include <functional>
+#include <iostream>
+#include <unistd.h>
 
 #define INCREMENT 1
 #define NUM_STAGES 5
@@ -30,13 +32,15 @@ Stage incrementStage(const Stage currentStage)
 
 void executeInstruction(MIPSCPU& cpu) 
 {
-     cpu.pipeline.push_front(Stage::IF_STAGE);
+     cpu.pipeline.push_back(Stage::IF_STAGE);
      for (auto& stage : cpu.pipeline)
      {    
           stage_v_table[static_cast<int>(stage)](cpu);
+          // std::cout << (int)(stage); std::cout.flush();
+          // sleep(1);
           if (stage == Stage::WB_STAGE) 
           {
-               cpu.pipeline.pop_back();
+               cpu.pipeline.pop_front();
           }
           stage = incrementStage(stage);
      }
@@ -59,60 +63,70 @@ void ID_STAGE(MIPSCPU& cpu)
                cpu.latches.ID_EX_LATCH = ID_RESULT{
                     .type = instructionTag,
                     .ADDI_instruction = BinaryParser::PARSE_ADDI(instruction, cpu)               
-               };        
+               };
+               break;        
 
           case B_OPCODE():
                cpu.latches.ID_EX_LATCH = ID_RESULT{
                     .type = instructionTag,
                     .B_instruction = BinaryParser::PARSE_B(instruction, cpu)
-               };          
+               };
+               break;          
 
           case BEQZ_OPCODE():
                cpu.latches.ID_EX_LATCH = ID_RESULT{
                     .type = instructionTag,
                     .BEQZ_instruction = BinaryParser::PARSE_BEQZ(instruction, cpu)
-               };          
+               };
+               break;          
 
           case BGE_OPCODE():
                cpu.latches.ID_EX_LATCH = ID_RESULT{
                     .type = instructionTag,
                     .BGE_instruction = BinaryParser::PARSE_BGE(instruction, cpu)
-               };          
+               };
+               break;          
 
           case BNE_OPCODE():
                cpu.latches.ID_EX_LATCH = ID_RESULT{
                     .type = instructionTag,
                     .BNE_instruction = BinaryParser::PARSE_BNE(instruction, cpu)
-               };          
+               };
+               break;          
 
           case LA_OPCODE():
                cpu.latches.ID_EX_LATCH = ID_RESULT{
                     .type = instructionTag,
                     .LA_instruction = BinaryParser::PARSE_LA(instruction, cpu)
-               };          
+               };
+               break;          
 
           case LB_OPCODE():
                cpu.latches.ID_EX_LATCH = ID_RESULT{
                     .type = instructionTag,
                     .LB_instruction = BinaryParser::PARSE_LB(instruction, cpu)
-               };          
+               };
+               break;          
 
           case LI_OPCODE():
                cpu.latches.ID_EX_LATCH = ID_RESULT{
                     .type = instructionTag,
                     .LI_instruction = BinaryParser::PARSE_LI(instruction, cpu)
-               };          
+               };
+               break;          
 
           case SUBI_OPCODE():
                cpu.latches.ID_EX_LATCH = ID_RESULT{
                     .type = instructionTag,
                     .SUBI_instruction = BinaryParser::PARSE_SUBI(instruction, cpu)
-               };         
+               };
+               break;         
+
           case SYSCALL_OPCODE():
-               SYSCALL(instruction ,cpu);
                cpu.latches.ID_EX_LATCH = ID_RESULT{
                     .type = instructionTag
                };
+               break;
      }
 }
 
@@ -122,34 +136,35 @@ void EX_STAGE(MIPSCPU& cpu)
      {
           case Instruction::ADDI:
                cpu.latches.EX_MEM_LATCH = ADDI(cpu.latches.ID_EX_LATCH.ADDI_instruction);               
-
+               break;
           case Instruction::B:
                cpu.latches.EX_MEM_LATCH = B(cpu.latches.ID_EX_LATCH.B_instruction, cpu);               
-
+               break;
           case Instruction::BEQZ:
                cpu.latches.EX_MEM_LATCH = BEQZ(cpu.latches.ID_EX_LATCH.BEQZ_instruction, cpu);               
-
+               break;
           case Instruction::BGE:
                cpu.latches.EX_MEM_LATCH = BGE(cpu.latches.ID_EX_LATCH.BGE_instruction, cpu);               
-
+               break;
           case Instruction::BNE:
                cpu.latches.EX_MEM_LATCH = BNE(cpu.latches.ID_EX_LATCH.BNE_instruction, cpu);               
-
+               break;
           case Instruction::LA:
                cpu.latches.EX_MEM_LATCH = LA(cpu.latches.ID_EX_LATCH.LA_instruction, cpu);            
-
+               break;
           case Instruction::LB:
                cpu.latches.EX_MEM_LATCH = LB(cpu.latches.ID_EX_LATCH.LB_instruction, cpu);            
-
+               break;
           case Instruction::LI:
                cpu.latches.EX_MEM_LATCH = LI(cpu.latches.ID_EX_LATCH.LI_instruction);            
-
+               break;
           case Instruction::SUBI:
                cpu.latches.EX_MEM_LATCH = SUBI(cpu.latches.ID_EX_LATCH.SUBI_instruction);       
-
+               break;
           case Instruction::SYSCALL:
                cpu.latches.EX_MEM_LATCH = EX_Result{MIPS_TYPE::SysType, NULL, 0};  
-     }
+               break;
+     }              
 }
 
 void MEM_STAGE(MIPSCPU& cpu) 
@@ -167,6 +182,7 @@ void MEM_STAGE(MIPSCPU& cpu)
                cpu.latches.MEM_WB_LATCH = MEM_Result{NULL, 0};
                break;
           case MIPS_TYPE::SysType:
+               SYSCALL(cpu);
                cpu.latches.MEM_WB_LATCH = MEM_Result{NULL, 0};
                break;
      }
