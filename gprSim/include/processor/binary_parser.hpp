@@ -21,7 +21,7 @@ namespace BinaryParser
     SUBI_Instruction    PARSE_SUBI   (const int32_t instruction, MIPSCPU& cpu);
 }
 
-struct InstructionType
+struct ID_RESULT
 {
     Instruction type;
     union 

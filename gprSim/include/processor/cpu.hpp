@@ -73,15 +73,15 @@ struct MIPSCPU // CPU has memory and registers (in this case accumulator & progr
 };
 
 /* Functions which implement each instruction in simulator */
-void ADDI(const ADDI_Instruction addi_instruction);
-void B(const B_Instruction b_instruction, MIPSCPU cpu);
-void BEQZ(const BEQZ_Instruction beqz_instruction, MIPSCPU cpu);
-void BGE(const BGE_Instruction bge_instruction, MIPSCPU cpu);
-void BNE(const BNE_Instruction bne_instruction, MIPSCPU cpu);
-void LA(const LA_Instruction la_instruction, MIPSCPU cpu);
-void LB(const LB_Instruction lb_instruction, MIPSCPU cpu);
-void LI(const LI_Instruction li_instruction);
-void SUBI(const SUBI_Instruction subi_instruction);
+EX_Result ADDI(const ADDI_Instruction addi_instruction);
+EX_Result B(const B_Instruction b_instruction, MIPSCPU cpu);
+EX_Result BEQZ(const BEQZ_Instruction beqz_instruction, MIPSCPU cpu);
+EX_Result BGE(const BGE_Instruction bge_instruction, MIPSCPU cpu);
+EX_Result BNE(const BNE_Instruction bne_instruction, MIPSCPU cpu);
+EX_Result LA(const LA_Instruction la_instruction, MIPSCPU cpu);
+EX_Result LB(const LB_Instruction lb_instruction, MIPSCPU cpu);
+EX_Result LI(const LI_Instruction li_instruction);
+EX_Result SUBI(const SUBI_Instruction subi_instruction);
 void SYSCALL(const int32_t instruction, MIPSCPU& cpu);
 
 #endif

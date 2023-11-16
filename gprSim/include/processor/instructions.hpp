@@ -18,6 +18,14 @@
  *      SYSCALL
  */
 
+enum MIPS_TYPE
+{
+    RType,
+    IType,
+    JType,
+    SysType
+};
+
 enum class Instruction               // OpCode Mappings
 {
     NOP                             = 0,
@@ -83,11 +91,26 @@ struct LI_Instruction
     int32_t* Rdest;
     int32_t Imm;
 };
+
 struct SUBI_Instruction
 {
     int32_t* Rdest;
     int32_t* Rsrc1;
     int32_t Imm;
+};
+
+
+struct EX_Result
+{
+    MIPS_TYPE type;
+    int32_t* destination;
+    int32_t result;
+};
+
+struct MEM_Result
+{
+    int32_t* destination;
+    int32_t result;
 };
 
 constexpr int32_t ADDI_OPCODE()

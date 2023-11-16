@@ -3,15 +3,17 @@
 #include "cpu.hpp"
 #include "binary_parser.hpp"
 
+using IF_RESULT = int32_t;
+
 struct MIPSCPU;
-struct InstructionType;
+struct ID_RESULT;
 
 struct PipelineLatches
 {
-    int32_t IF_ID_LATCH;
-    InstructionType ID_EX_LATCH;
-    int32_t EX_MEM_LATCH;
-    int32_t MEM_WB_LATCH;
+    IF_RESULT IF_ID_LATCH;
+    ID_RESULT ID_EX_LATCH;
+    EX_Result EX_MEM_LATCH;
+    MEM_Result MEM_WB_LATCH;
 };
 
 enum class Stage
