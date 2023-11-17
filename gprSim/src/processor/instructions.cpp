@@ -26,6 +26,7 @@ std::map<Name, Opcode> getOpcodeTable()
 {
     return std::map<Name, Opcode>
     {
+        {"NOP",     static_cast<int32_t>(Instruction::NOP)   },
         {"ADDI",    static_cast<int32_t>(Instruction::ADDI)   },
         {"B",       static_cast<int32_t>(Instruction::B)      },
         {"BEQZ",    static_cast<int32_t>(Instruction::BEQZ)   },

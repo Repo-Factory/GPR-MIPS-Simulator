@@ -17,6 +17,7 @@
 #define WHITE_SPACE_IDENTIFIER          ' '
 #define DATA_SECTION_IDENTIFIER         ".data"
 #define TEXT_SECTION_IDENTIFIER         ".text"
+#define NOP                             0
 #define FIRST_CHAR(line)                line[0]
 #define INCREMENT(ptr)                  ptr+=1
 
@@ -24,7 +25,9 @@ void debugPrint(Memory& memory)
 {
     std::cout << "_______________ INSTRUCTIONS ______________" << std::endl;
     for (int i = 0; i < 32; ++i) {
-        std::cout << "Memory[" << i << "]: "; printBinary(*((int32_t*)&memory + i));
+        std::cout << "Memory[" << i << "]: ";
+        if (i < 10) {std::cout << " ";}
+        printBinary(*((int32_t*)&memory + i));
     }  std::cout << "_______________ INSTRUCTIONS ______________"  << std::endl;
     std::cout << std::endl << "________________ SYMBOL TABLE  _____________" << std::endl;
     std::cout << memory.symbol_table;
@@ -67,7 +70,7 @@ void Loader::performFirstPass(Memory& memory, std::ifstream& sourceCode)
     iterateFile(sourceCode, [&](const std::string& line) {
         this->LOCCTR = updateMemorySectionIfNecessary(this->LOCCTR, memory, line);
         SymbolTable::addSymbolTableEntryIfNecessary(this->LOCCTR, memory, line);
-        if (Parser::isBranchInstruction(line)) { this->LOCCTR+=2; }
+        if (Parser::isBranchInstruction(line)) { this->LOCCTR+=2; }     // Account for NOP
         else if (Parser::isInstruction(line)) { this->LOCCTR+=1; }
     });
 }
@@ -80,7 +83,7 @@ void Loader::performSecondPass(Memory& memory, std::ifstream& sourceCode)
     iterateFile(sourceCode, [&](const std::string& line) {
         this->LOCCTR = updateMemorySectionIfNecessary(this->LOCCTR, memory, line);
         if (Parser::isInstruction(line)) {
-            if (Parser::isBranchInstruction(line)) {writeContents(this->LOCCTR++, 0);} // Insert NOP for branches
+            if (Parser::isBranchInstruction(line)) {writeContents(this->LOCCTR++, NOP);}          // Insert NOP for branches
             writeContents(this->LOCCTR++, Parser::parseInstruction(line, memory, this->LOCCTR));
         }   // Place 32 bit instruction into text section 
     });

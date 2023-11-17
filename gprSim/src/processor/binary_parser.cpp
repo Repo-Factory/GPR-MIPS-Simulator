@@ -51,7 +51,7 @@ ADDI_Instruction BinaryParser::PARSE_ADDI(const int32_t instruction, MIPSCPU& cp
 
 B_Instruction BinaryParser::PARSE_B(const int32_t instruction, MIPSCPU& cpu)
 {
-    const int32_t label               = (((instruction >> 0 & xOnes(26)) << 6) >> 6);   // Correct for signedness
+    const int32_t label               = fixSignedness(instruction >> 0 & xOnes(26), 6);   // Correct for signedness
     cpu.pc += ACCOUNT_FOR_INCREMENTED_PC(label);
     return B_Instruction              {label};
 }
@@ -59,7 +59,7 @@ B_Instruction BinaryParser::PARSE_B(const int32_t instruction, MIPSCPU& cpu)
 BEQZ_Instruction BinaryParser::PARSE_BEQZ(const int32_t instruction, MIPSCPU& cpu)
 {
     const int32_t r_src_identifier   = instruction >> 21    & xOnes(REGISTER_BITS);
-    const int32_t label              = fixSignedness(instruction >> 0 & xOnes(21), 21);
+    const int32_t label              = fixSignedness(instruction >> 0 & xOnes(21), 11);
     if (*cpu.registerMap[r_src_identifier] == 0) { 
         cpu.pc+=ACCOUNT_FOR_INCREMENTED_PC(label);
     }
@@ -81,7 +81,7 @@ BNE_Instruction BinaryParser::PARSE_BNE(const int32_t instruction, MIPSCPU& cpu)
 {
     const int32_t r_src_identifier   = instruction >> 21    & xOnes(REGISTER_BITS);
     const int32_t r_src2_identifier  = instruction >> 16    & xOnes(REGISTER_BITS);
-    const int32_t label              = instruction >> 0     & xOnes(16);
+    const int32_t label              = fixSignedness(instruction >> 0 & xOnes(16), 16);
     if (*cpu.registerMap[r_src_identifier] != *cpu.registerMap[r_src2_identifier]) {
         cpu.pc+=ACCOUNT_FOR_INCREMENTED_PC(label);
     }

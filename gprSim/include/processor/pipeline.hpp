@@ -30,6 +30,6 @@ void ID_STAGE(MIPSCPU& cpu);
 void EX_STAGE(MIPSCPU& cpu);
 void MEM_STAGE(MIPSCPU& cpu);
 void WB_STAGE(MIPSCPU& cpu);
-void executeInstruction(MIPSCPU& cpu);
+void clockCycle(MIPSCPU& cpu);
 
 #endif

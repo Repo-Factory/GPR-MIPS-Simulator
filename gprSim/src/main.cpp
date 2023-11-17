@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
 
     cpu->userMode = true;
     while (cpu->userMode) {
-        executeInstruction(*cpu);                                // defined in cpu.cpp
+        clockCycle(*cpu);                                // defined in cpu.cpp
     }
 
     exit(EXIT_SUCCESS);

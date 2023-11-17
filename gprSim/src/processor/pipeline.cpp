@@ -30,7 +30,7 @@ Stage incrementStage(const Stage currentStage)
      return static_cast<Stage>(static_cast<int>(currentStage) + 1);
 }
 
-void executeInstruction(MIPSCPU& cpu) 
+void clockCycle(MIPSCPU& cpu) 
 {
      cpu.pipeline.push_back(Stage::IF_STAGE);
      for (auto& stage : cpu.pipeline)
