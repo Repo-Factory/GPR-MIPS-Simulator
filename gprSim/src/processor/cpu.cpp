@@ -31,7 +31,7 @@
  */ 
 int32_t* ABSOLUTE_BASE_ADDRESS(MIPSCPU& cpu) 
 {
-    return (int32_t*)&cpu.memory;           
+    return cpu.BASE;           
 }
 
 EX_Result ADDI(const ADDI_Instruction addi_instruction)
@@ -67,13 +67,17 @@ EX_Result BNE(const BNE_Instruction bne_instruction, MIPSCPU cpu)
 // is from the PC (stored in the label), and we will have the distance from the absolute base address stored in the register
 EX_Result LA(const LA_Instruction la_instruction, MIPSCPU cpu)
 {
-    return EX_Result{MIPS_TYPE::IType, la_instruction.Rdest, (int32_t)(cpu.pc - ABSOLUTE_BASE_ADDRESS(cpu)) + ACCOUNT_FOR_INCREMENTED_PC(la_instruction.label)};
+    // std::cout << cpu.pc << " " << ABSOLUTE_BASE_ADDRESS(cpu) << " " << cpu.pc - ABSOLUTE_BASE_ADDRESS(cpu)  << " " << ACCOUNT_FOR_INCREMENTED_PC(la_instruction.label) << std::endl; std::cout.flush();
+    // std::cout << cpu.pc + (cpu.pc - ABSOLUTE_BASE_ADDRESS(cpu)) + ACCOUNT_FOR_INCREMENTED_PC(la_instruction.label) << std::endl;
+    // std::cout << *(ABSOLUTE_BASE_ADDRESS(cpu) + ((cpu.pc - ABSOLUTE_BASE_ADDRESS(cpu)) + ACCOUNT_FOR_INCREMENTED_PC(la_instruction.label))) << std::endl;
+    
+    return EX_Result{MIPS_TYPE::IType, la_instruction.Rdest, (cpu.pc - ABSOLUTE_BASE_ADDRESS(cpu)) + ACCOUNT_FOR_INCREMENTED_PC(la_instruction.label)};
 }   // Use Fixed Address &cpu.memory to convert to absolute address.
 
 // Here we want to dereference a byte of data that is found out a certain distance from the source register.
 EX_Result LB(const LB_Instruction lb_instruction, MIPSCPU cpu)
 {
-    return EX_Result{MIPS_TYPE::IType, lb_instruction.Rdest, *(char*)(ABSOLUTE_BASE_ADDRESS(cpu) + *(lb_instruction.Rsrc1 + lb_instruction.offset))};
+    return EX_Result{MIPS_TYPE::IType, lb_instruction.Rdest, *(char*)(ABSOLUTE_BASE_ADDRESS(cpu) + *(lb_instruction.Rsrc1 + lb_instruction.offset))}; //
 }   // Dereferencing char pointer gives us a byte
 
 EX_Result LI(const LI_Instruction li_instruction)

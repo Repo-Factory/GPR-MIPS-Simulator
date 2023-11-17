@@ -22,6 +22,7 @@ struct MIPSCPU // CPU has memory and registers (in this case accumulator & progr
 {
     Memory          memory;
     bool userMode = false;
+    int32_t* BASE = memory.userTextPtr;
     int32_t* pc =   memory.userTextPtr;
     int32_t* $0 =   new int32_t();               // (zero)
     int32_t* $1 =   new int32_t();               // (at)

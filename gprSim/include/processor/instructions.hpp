@@ -104,13 +104,13 @@ struct EX_Result
 {
     MIPS_TYPE type;
     int32_t* destination;
-    int32_t result;
+    long result;
 };
 
 struct MEM_Result
 {
     int32_t* destination;
-    int32_t result;
+    long result;
 };
 
 constexpr int32_t ADDI_OPCODE()
