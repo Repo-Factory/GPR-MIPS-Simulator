@@ -70,7 +70,7 @@ BGE_Instruction BinaryParser::PARSE_BGE(const int32_t instruction, MIPSCPU& cpu)
 {
     const int32_t r_src_identifier   = instruction >> 21    & xOnes(REGISTER_BITS);
     const int32_t r_src2_identifier  = instruction >> 16    & xOnes(REGISTER_BITS);
-    const int32_t label              = instruction >> 0     & xOnes(16);
+    const int32_t label              = fixSignedness(instruction >> 0 & xOnes(16), 16);
     if (*cpu.registerMap[r_src_identifier] >= *cpu.registerMap[r_src2_identifier]) {
         cpu.pc+=ACCOUNT_FOR_INCREMENTED_PC(label);
     }

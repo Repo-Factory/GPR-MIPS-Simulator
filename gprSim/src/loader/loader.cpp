@@ -67,7 +67,8 @@ void Loader::performFirstPass(Memory& memory, std::ifstream& sourceCode)
     iterateFile(sourceCode, [&](const std::string& line) {
         this->LOCCTR = updateMemorySectionIfNecessary(this->LOCCTR, memory, line);
         SymbolTable::addSymbolTableEntryIfNecessary(this->LOCCTR, memory, line);
-        if (Parser::isInstruction(line)) { this->LOCCTR+=2; }
+        if (Parser::isBranchInstruction(line)) { this->LOCCTR+=2; }
+        else if (Parser::isInstruction(line)) { this->LOCCTR+=1; }
     });
 }
 
@@ -79,8 +80,8 @@ void Loader::performSecondPass(Memory& memory, std::ifstream& sourceCode)
     iterateFile(sourceCode, [&](const std::string& line) {
         this->LOCCTR = updateMemorySectionIfNecessary(this->LOCCTR, memory, line);
         if (Parser::isInstruction(line)) {
-            writeContents(this->LOCCTR++, Parser::parseInstruction(line, memory, this->LOCCTR)); 
-            writeContents(this->LOCCTR++, 0);
+            if (Parser::isBranchInstruction(line)) {writeContents(this->LOCCTR++, 0);} // Insert NOP for branches
+            writeContents(this->LOCCTR++, Parser::parseInstruction(line, memory, this->LOCCTR));
         }   // Place 32 bit instruction into text section 
     });
 }

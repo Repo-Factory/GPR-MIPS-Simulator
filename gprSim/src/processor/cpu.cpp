@@ -66,11 +66,7 @@ EX_Result BNE(const BNE_Instruction bne_instruction, MIPSCPU cpu)
 // We do know how far it is from the PC. So we can find how far the pc is from the base address, add that to how far the address
 // is from the PC (stored in the label), and we will have the distance from the absolute base address stored in the register
 EX_Result LA(const LA_Instruction la_instruction, MIPSCPU cpu)
-{
-    // std::cout << cpu.pc << " " << ABSOLUTE_BASE_ADDRESS(cpu) << " " << cpu.pc - ABSOLUTE_BASE_ADDRESS(cpu)  << " " << ACCOUNT_FOR_INCREMENTED_PC(la_instruction.label) << std::endl; std::cout.flush();
-    // std::cout << cpu.pc + (cpu.pc - ABSOLUTE_BASE_ADDRESS(cpu)) + ACCOUNT_FOR_INCREMENTED_PC(la_instruction.label) << std::endl;
-    // std::cout << *(ABSOLUTE_BASE_ADDRESS(cpu) + ((cpu.pc - ABSOLUTE_BASE_ADDRESS(cpu)) + ACCOUNT_FOR_INCREMENTED_PC(la_instruction.label))) << std::endl;
-    
+{    
     return EX_Result{MIPS_TYPE::IType, la_instruction.Rdest, (cpu.pc - ABSOLUTE_BASE_ADDRESS(cpu)) + ACCOUNT_FOR_INCREMENTED_PC(la_instruction.label)};
 }   // Use Fixed Address &cpu.memory to convert to absolute address.
 
@@ -112,13 +108,13 @@ void exitProcedure(MIPSCPU& cpu)
     const int instructionsExecuted = cpu.instructionsExecuted(GET);
     const float speedup = SPEEDUP(instructionsExecuted, totalCycles);
     
-    printf(TOTAL_INSTRUCTIONS_MESSAGE, instructionsExecuted);
-    printf(TOTAL_CYCLES_MESSAGE, totalCycles);
-    printf(SPEEDUP_MESSAGE, speedup);
+    // printf(TOTAL_INSTRUCTIONS_MESSAGE, instructionsExecuted);
+    // printf(TOTAL_CYCLES_MESSAGE, totalCycles);
+    // printf(SPEEDUP_MESSAGE, speedup);
     
-    forEachItem(cpu.cyclesPerUnit(GET, nullptr), NUM_FUNCTIONAL_UNITS, [&](int cycles, int index) {
-        printf(CYCLES_FOR_FUNCTIONAL_UNIT_MESSAGE, functionalUnitsNamesClosure()()[index].c_str(), cycles);
-    }); // Print Cycles for each functional unit
+    // forEachItem(cpu.cyclesPerUnit(GET, nullptr), NUM_FUNCTIONAL_UNITS, [&](int cycles, int index) {
+    //     printf(CYCLES_FOR_FUNCTIONAL_UNIT_MESSAGE, functionalUnitsNamesClosure()()[index].c_str(), cycles);
+    // }); // Print Cycles for each functional unit
 
     FILE* output = fopen(OUTPUT_FILE, WRITE_MODE);
     fprintf(output, OUTPUT_MESSAGE, instructionsExecuted, totalCycles, speedup);

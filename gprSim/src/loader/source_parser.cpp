@@ -23,6 +23,8 @@
 #include "instructions.hpp"
 #include <iostream>
 #include <cmath>
+#include <set>
+#include <algorithm>
 
 // Lengths in bits
 constexpr const int INSTRUCTION_LENGTH                          = 32;
@@ -98,4 +100,11 @@ bool Parser::isInstruction(const std::string& instruction)
 {
     const std::string firstWord = getFirstWordOfLine(instruction);
     return OpcodeTable::searchTable(firstWord);
+}
+
+bool Parser::isBranchInstruction(const std::string& instruction)
+{
+    const std::string firstWord = getFirstWordOfLine(instruction);
+    std::set<std::string> branchInstructions {"b","beqz","bge","bne"}; 
+    return branchInstructions.count((firstWord));
 }
