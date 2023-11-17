@@ -200,8 +200,8 @@ void MEM_STAGE(MIPSCPU& cpu)
 
 void WB_STAGE(MIPSCPU& cpu) 
 {
-     if (cpu.latches.EX_MEM_LATCH.destination != NULL)
+     if (cpu.latches.MEM_WB_LATCH.destination != NULL)
      {
-          *cpu.latches.EX_MEM_LATCH.destination = cpu.latches.EX_MEM_LATCH.result;
+          *cpu.latches.MEM_WB_LATCH.destination = cpu.latches.MEM_WB_LATCH.result;
      }
 }

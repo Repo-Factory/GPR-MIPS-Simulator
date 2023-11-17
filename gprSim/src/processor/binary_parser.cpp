@@ -11,6 +11,11 @@ constexpr const int OFFSET_BITS         = 16;
 constexpr const int REGISTER_BITS       = 5; 
 constexpr const int NON_OPCODE_BITS     = INSTRUCTION_SIZE-OPCODE_BITS;
 
+int32_t fixSignedness(const int x, const int shift)
+{
+    return ((x << shift) >> shift);
+}
+
 int32_t xOnes(const int x) // Generate Bit Stream of X number of Ones
 {
     return ((BIT << x) - 1); // -1 flips all bits behind the 1
@@ -54,7 +59,7 @@ B_Instruction BinaryParser::PARSE_B(const int32_t instruction, MIPSCPU& cpu)
 BEQZ_Instruction BinaryParser::PARSE_BEQZ(const int32_t instruction, MIPSCPU& cpu)
 {
     const int32_t r_src_identifier   = instruction >> 21    & xOnes(REGISTER_BITS);
-    const int32_t label              = instruction >> 0     & xOnes(21);
+    const int32_t label              = fixSignedness(instruction >> 0 & xOnes(21), 21);
     if (*cpu.registerMap[r_src_identifier] == 0) { 
         cpu.pc+=ACCOUNT_FOR_INCREMENTED_PC(label);
     }

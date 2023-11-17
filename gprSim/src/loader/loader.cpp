@@ -67,7 +67,7 @@ void Loader::performFirstPass(Memory& memory, std::ifstream& sourceCode)
     iterateFile(sourceCode, [&](const std::string& line) {
         this->LOCCTR = updateMemorySectionIfNecessary(this->LOCCTR, memory, line);
         SymbolTable::addSymbolTableEntryIfNecessary(this->LOCCTR, memory, line);
-        if (Parser::isInstruction(line)) { INCREMENT(LOCCTR); }
+        if (Parser::isInstruction(line)) { this->LOCCTR+=2; }
     });
 }
 

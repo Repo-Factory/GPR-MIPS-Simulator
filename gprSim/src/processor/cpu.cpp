@@ -129,7 +129,7 @@ namespace // SYSCALL HELPERS
 {
     void printStringAtAddress(const int32_t* address, MIPSCPU& cpu)
     {
-        std::string* ptr = (std::string*)(ABSOLUTE_BASE_ADDRESS(cpu) + (*address));
+        std::string* ptr = (std::string*)(ABSOLUTE_BASE_ADDRESS(cpu) + (*(address)-1));
         std::cout << *ptr << std::endl;
     }
 
