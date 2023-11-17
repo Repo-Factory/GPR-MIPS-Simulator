@@ -55,7 +55,7 @@ BEQZ_Instruction BinaryParser::PARSE_BEQZ(const int32_t instruction, MIPSCPU& cp
 {
     const int32_t r_src_identifier   = instruction >> 21    & xOnes(REGISTER_BITS);
     const int32_t label              = instruction >> 0     & xOnes(21);
-    if (r_src_identifier == 0) { 
+    if (*cpu.registerMap[r_src_identifier] == 0) { 
         cpu.pc+=ACCOUNT_FOR_INCREMENTED_PC(label);
     }
     return BEQZ_Instruction          {cpu.registerMap[r_src_identifier], label};
@@ -66,7 +66,7 @@ BGE_Instruction BinaryParser::PARSE_BGE(const int32_t instruction, MIPSCPU& cpu)
     const int32_t r_src_identifier   = instruction >> 21    & xOnes(REGISTER_BITS);
     const int32_t r_src2_identifier  = instruction >> 16    & xOnes(REGISTER_BITS);
     const int32_t label              = instruction >> 0     & xOnes(16);
-    if (r_src_identifier >= r_src2_identifier) {
+    if (*cpu.registerMap[r_src_identifier] >= *cpu.registerMap[r_src2_identifier]) {
         cpu.pc+=ACCOUNT_FOR_INCREMENTED_PC(label);
     }
     return BGE_Instruction           {cpu.registerMap[r_src_identifier], cpu.registerMap[r_src2_identifier], label};
@@ -77,7 +77,7 @@ BNE_Instruction BinaryParser::PARSE_BNE(const int32_t instruction, MIPSCPU& cpu)
     const int32_t r_src_identifier   = instruction >> 21    & xOnes(REGISTER_BITS);
     const int32_t r_src2_identifier  = instruction >> 16    & xOnes(REGISTER_BITS);
     const int32_t label              = instruction >> 0     & xOnes(16);
-    if (r_src_identifier != r_src2_identifier) {
+    if (*cpu.registerMap[r_src_identifier] != *cpu.registerMap[r_src2_identifier]) {
         cpu.pc+=ACCOUNT_FOR_INCREMENTED_PC(label);
     }
     return BNE_Instruction           {cpu.registerMap[r_src_identifier], cpu.registerMap[r_src2_identifier], label};

@@ -20,6 +20,7 @@
 
 enum MIPS_TYPE
 {
+    NType,
     RType,
     IType,
     JType,
@@ -112,6 +113,11 @@ struct MEM_Result
     int32_t* destination;
     long result;
 };
+
+constexpr int32_t NOP_OPCODE()
+{
+    return static_cast<int32_t>(Instruction::NOP);
+}
 
 constexpr int32_t ADDI_OPCODE()
 {

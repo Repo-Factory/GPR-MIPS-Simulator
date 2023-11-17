@@ -3,10 +3,10 @@
 #include <map>
 #include <string>
 
-#define USER_TEXT_SIZE 1024
-#define KERNEL_TEXT_SIZE  512
-#define USER_DATA_SIZE 1024
-#define KERNEL_DATA_SIZE 512
+#define USER_TEXT_SIZE 2048
+#define KERNEL_TEXT_SIZE  1024  
+#define USER_DATA_SIZE 2048
+#define KERNEL_DATA_SIZE 1024
 
 /* Lays out 4 sections of memory
  * Each section can be accessed by its corresponding pointer field

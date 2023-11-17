@@ -80,7 +80,8 @@ void Loader::performSecondPass(Memory& memory, std::ifstream& sourceCode)
         this->LOCCTR = updateMemorySectionIfNecessary(this->LOCCTR, memory, line);
         if (Parser::isInstruction(line)) {
             writeContents(this->LOCCTR++, Parser::parseInstruction(line, memory, this->LOCCTR)); 
-        }   // Place 32 bit instruction into text section
+            writeContents(this->LOCCTR++, 0);
+        }   // Place 32 bit instruction into text section 
     });
 }
 

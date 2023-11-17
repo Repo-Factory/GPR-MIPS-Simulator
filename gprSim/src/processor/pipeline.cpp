@@ -36,8 +36,6 @@ void executeInstruction(MIPSCPU& cpu)
      for (auto& stage : cpu.pipeline)
      {    
           stage_v_table[static_cast<int>(stage)](cpu);
-          // std::cout << (int)(stage); std::cout.flush();
-          // sleep(1);
           if (stage == Stage::WB_STAGE) 
           {
                cpu.pipeline.pop_front();
@@ -59,6 +57,12 @@ void ID_STAGE(MIPSCPU& cpu)
 
      switch(opcode)
      {
+          case NOP_OPCODE():
+               cpu.latches.ID_EX_LATCH = ID_RESULT{
+                    .type = instructionTag,            
+               };
+               break;        
+
           case ADDI_OPCODE():
                cpu.latches.ID_EX_LATCH = ID_RESULT{
                     .type = instructionTag,
@@ -134,6 +138,9 @@ void EX_STAGE(MIPSCPU& cpu)
 {
      switch(cpu.latches.ID_EX_LATCH.type)
      {
+          case Instruction::NOP:
+               cpu.latches.EX_MEM_LATCH = EX_Result{MIPS_TYPE::NType, NULL, 0};               
+               break;
           case Instruction::ADDI:
                cpu.latches.EX_MEM_LATCH = ADDI(cpu.latches.ID_EX_LATCH.ADDI_instruction);               
                break;
@@ -171,6 +178,9 @@ void MEM_STAGE(MIPSCPU& cpu)
 {
      switch(cpu.latches.EX_MEM_LATCH.type)
      {
+          case MIPS_TYPE::NType:
+               cpu.latches.MEM_WB_LATCH = MEM_Result{NULL, 0};
+               break;
           case MIPS_TYPE::RType:
                cpu.latches.MEM_WB_LATCH = MEM_Result{cpu.latches.EX_MEM_LATCH.destination, cpu.latches.EX_MEM_LATCH.result};
                break;
