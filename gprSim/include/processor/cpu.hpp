@@ -69,6 +69,7 @@ struct MIPSCPU // CPU has memory and registers (in this case accumulator & progr
     };
     const IntArrayF cyclesPerUnit       = cyclesPerUnitClosure();
     const IntF  instructionsExecuted    = instructionsExecutedClosure();
+    const IntF  nopCount                = nopCountClosure(); 
     PipelineLatches latches;
     std::deque<Stage> pipeline;
 };

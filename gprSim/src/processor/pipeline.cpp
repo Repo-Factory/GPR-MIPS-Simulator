@@ -7,12 +7,14 @@
 #include "pipeline.hpp"
 #include "instructions.hpp"
 #include "binary_parser.hpp"
+#include "array_helpers.hpp"
 #include <deque>
 #include <cstdint>
 #include <functional>
 #include <iostream>
 #include <unistd.h>
 
+#define SET 1
 #define INCREMENT 1
 #define NUM_STAGES 5
 
@@ -132,6 +134,10 @@ void ID_STAGE(MIPSCPU& cpu)
                };
                break;
      }
+
+     cpu.cyclesPerUnit(SET, cyclesTableClosure()()[opcode].data()); // Increment cycles of each functional unit
+     cpu.instructionsExecuted(INCREMENT);      // Incremenent total instructions executed
+     cpu.nopCount(opcode==NOP_OPCODE());
 }
 
 void EX_STAGE(MIPSCPU& cpu) 

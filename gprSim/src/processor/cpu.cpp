@@ -60,20 +60,27 @@ EX_Result BNE(const BNE_Instruction bne_instruction, MIPSCPU cpu)
     return EX_Result{MIPS_TYPE::JType, NULL, 0};
 }
 
-// Here the label that was stored is relative to the pc counter. However, we have to store an absolute address because
+// Here the label that was stored is relative to the pc counter (LOCCTR). However, we have to store an absolute address because
 // if we jump from the PC the offset will have changed at a new instruction. We can use the absolute base address to 
 // jump from an absolute reference point. However, we don't explicitly know how far the target is from the absolute base address.
 // We do know how far it is from the PC. So we can find how far the pc is from the base address, add that to how far the address
 // is from the PC (stored in the label), and we will have the distance from the absolute base address stored in the register
-EX_Result LA(const LA_Instruction la_instruction, MIPSCPU cpu)
+EX_Result LA(const LA_Instruction la_instruction, MIPSCPU cpu)  // Address is stored as offset from base
 {    
-    return EX_Result{MIPS_TYPE::IType, la_instruction.Rdest, (cpu.pc - ABSOLUTE_BASE_ADDRESS(cpu)) + ACCOUNT_FOR_INCREMENTED_PC(la_instruction.label)};
+    const long offsetBetweenPcAndBase = cpu.pc - ABSOLUTE_BASE_ADDRESS(cpu);
+    const int32_t pcRelativeLabelOffset = ACCOUNT_FOR_INCREMENTED_PC(la_instruction.label);
+    const long baseRelativeAddress = offsetBetweenPcAndBase + pcRelativeLabelOffset;  // Label is stored as offset from PC
+    return EX_Result{MIPS_TYPE::IType, la_instruction.Rdest, baseRelativeAddress};
 }   // Use Fixed Address &cpu.memory to convert to absolute address.
 
 // Here we want to dereference a byte of data that is found out a certain distance from the source register.
 EX_Result LB(const LB_Instruction lb_instruction, MIPSCPU cpu)
 {
-    return EX_Result{MIPS_TYPE::IType, lb_instruction.Rdest, *(char*)(ABSOLUTE_BASE_ADDRESS(cpu) + *(lb_instruction.Rsrc1 + lb_instruction.offset))}; //
+    const int32_t* offsetAddress = lb_instruction.Rsrc1 + lb_instruction.offset;
+    const long offsetAddressContents = *offsetAddress;
+    const int32_t* byteAddress = ABSOLUTE_BASE_ADDRESS(cpu) + offsetAddressContents;
+    const long byteAddressContents = *(char*)byteAddress;
+    return EX_Result{MIPS_TYPE::IType, lb_instruction.Rdest, byteAddressContents}; //
 }   // Dereferencing char pointer gives us a byte
 
 EX_Result LI(const LI_Instruction li_instruction)
@@ -92,6 +99,7 @@ constexpr const char* TOTAL_INSTRUCTIONS_MESSAGE =            "Total Instruction
 constexpr const char* TOTAL_CYCLES_MESSAGE =                  "Total Cycles Taken: %d\n";
 constexpr const char* SPEEDUP_MESSAGE =                       "Speedup: %f\n";
 constexpr const char* CYCLES_FOR_FUNCTIONAL_UNIT_MESSAGE =    "Cycles for %s: %d\n";
+constexpr const char* NOP_COUNT_MESSAGE =                     "Number of NOP Instructions: %d\n";
 
 constexpr const char* OUTPUT_FILE =                           "result2.txt";
 constexpr const char* WRITE_MODE =                            "w";
@@ -108,13 +116,14 @@ void exitProcedure(MIPSCPU& cpu)
     const int instructionsExecuted = cpu.instructionsExecuted(GET);
     const float speedup = SPEEDUP(instructionsExecuted, totalCycles);
     
-    // printf(TOTAL_INSTRUCTIONS_MESSAGE, instructionsExecuted);
-    // printf(TOTAL_CYCLES_MESSAGE, totalCycles);
-    // printf(SPEEDUP_MESSAGE, speedup);
+    printf(TOTAL_INSTRUCTIONS_MESSAGE, instructionsExecuted);
+    printf(TOTAL_CYCLES_MESSAGE, totalCycles);
+    printf(SPEEDUP_MESSAGE, speedup);
     
-    // forEachItem(cpu.cyclesPerUnit(GET, nullptr), NUM_FUNCTIONAL_UNITS, [&](int cycles, int index) {
-    //     printf(CYCLES_FOR_FUNCTIONAL_UNIT_MESSAGE, functionalUnitsNamesClosure()()[index].c_str(), cycles);
-    // }); // Print Cycles for each functional unit
+    forEachItem(cpu.cyclesPerUnit(GET, nullptr), NUM_FUNCTIONAL_UNITS, [&](int cycles, int index) {
+        printf(CYCLES_FOR_FUNCTIONAL_UNIT_MESSAGE, functionalUnitsNamesClosure()()[index].c_str(), cycles);
+    }); // Print Cycles for each functional unit
+    printf(NOP_COUNT_MESSAGE, cpu.nopCount(GET));
 
     FILE* output = fopen(OUTPUT_FILE, WRITE_MODE);
     fprintf(output, OUTPUT_MESSAGE, instructionsExecuted, totalCycles, speedup);

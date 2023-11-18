@@ -52,3 +52,11 @@ const std::function<int(bool)> instructionsExecutedClosure()
     };
 }
 
+const std::function<int(bool)> nopCountClosure()
+{
+    int nopCount = 0;   // Init Cycles for each functional unit to be 0
+    return [=](const bool set) mutable {   
+        return set ? nopCount++ : nopCount;   
+    };
+}
+
