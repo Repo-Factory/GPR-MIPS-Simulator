@@ -41,32 +41,32 @@ int32_t BinaryParser::extractOpcode(const int32_t instruction)
  *      SYSCALL
  */
 
-ADDI_Instruction BinaryParser::PARSE_ADDI(const int32_t instruction, MIPSCPU& cpu)
+ADDI_Result BinaryParser::PARSE_ADDI(const int32_t instruction, MIPSCPU& cpu)
 {
     const int32_t r_dest_identifier   = instruction >> 21  & xOnes(REGISTER_BITS);
     const int32_t r_src_identifier    = instruction >> 16  & xOnes(REGISTER_BITS);
     const int32_t imm                 = instruction >> 0   & xOnes(IMMEDIATE_BITS);
-    return ADDI_Instruction           {cpu.registerMap[r_dest_identifier], cpu.registerMap[r_src_identifier], imm};
+    return ADDI_Result           {cpu.registerMap[r_dest_identifier], cpu.registerMap[r_src_identifier], imm};
 }
 
-B_Instruction BinaryParser::PARSE_B(const int32_t instruction, MIPSCPU& cpu)
+B_Result BinaryParser::PARSE_B(const int32_t instruction, MIPSCPU& cpu)
 {
     const int32_t label               = fixSignedness(instruction >> 0 & xOnes(26), 6);   // Correct for signedness
     cpu.pc += ACCOUNT_FOR_INCREMENTED_PC(label);
-    return B_Instruction              {label};
+    return B_Result              {label};
 }
 
-BEQZ_Instruction BinaryParser::PARSE_BEQZ(const int32_t instruction, MIPSCPU& cpu)
+BEQZ_Result BinaryParser::PARSE_BEQZ(const int32_t instruction, MIPSCPU& cpu)
 {
     const int32_t r_src_identifier   = instruction >> 21    & xOnes(REGISTER_BITS);
     const int32_t label              = fixSignedness(instruction >> 0 & xOnes(21), 11);
     if (*cpu.registerMap[r_src_identifier] == 0) { 
         cpu.pc+=ACCOUNT_FOR_INCREMENTED_PC(label);
     }
-    return BEQZ_Instruction          {cpu.registerMap[r_src_identifier], label};
+    return BEQZ_Result          {cpu.registerMap[r_src_identifier], label};
 }
 
-BGE_Instruction BinaryParser::PARSE_BGE(const int32_t instruction, MIPSCPU& cpu)
+BGE_Result BinaryParser::PARSE_BGE(const int32_t instruction, MIPSCPU& cpu)
 {
     const int32_t r_src_identifier   = instruction >> 21    & xOnes(REGISTER_BITS);
     const int32_t r_src2_identifier  = instruction >> 16    & xOnes(REGISTER_BITS);
@@ -74,10 +74,10 @@ BGE_Instruction BinaryParser::PARSE_BGE(const int32_t instruction, MIPSCPU& cpu)
     if (*cpu.registerMap[r_src_identifier] >= *cpu.registerMap[r_src2_identifier]) {
         cpu.pc+=ACCOUNT_FOR_INCREMENTED_PC(label);
     }
-    return BGE_Instruction           {cpu.registerMap[r_src_identifier], cpu.registerMap[r_src2_identifier], label};
+    return BGE_Result           {cpu.registerMap[r_src_identifier], cpu.registerMap[r_src2_identifier], label};
 }
 
-BNE_Instruction BinaryParser::PARSE_BNE(const int32_t instruction, MIPSCPU& cpu)
+BNE_Result BinaryParser::PARSE_BNE(const int32_t instruction, MIPSCPU& cpu)
 {
     const int32_t r_src_identifier   = instruction >> 21    & xOnes(REGISTER_BITS);
     const int32_t r_src2_identifier  = instruction >> 16    & xOnes(REGISTER_BITS);
@@ -85,35 +85,35 @@ BNE_Instruction BinaryParser::PARSE_BNE(const int32_t instruction, MIPSCPU& cpu)
     if (*cpu.registerMap[r_src_identifier] != *cpu.registerMap[r_src2_identifier]) {
         cpu.pc+=ACCOUNT_FOR_INCREMENTED_PC(label);
     }
-    return BNE_Instruction           {cpu.registerMap[r_src_identifier], cpu.registerMap[r_src2_identifier], label};
+    return BNE_Result           {cpu.registerMap[r_src_identifier], cpu.registerMap[r_src2_identifier], label};
 }
 
-LA_Instruction BinaryParser::PARSE_LA(const int32_t instruction, MIPSCPU& cpu)
+LA_Result BinaryParser::PARSE_LA(const int32_t instruction, MIPSCPU& cpu)
 {
     const int32_t r_src_identifier   = instruction >> 21    & xOnes(REGISTER_BITS);
     const int32_t label              = instruction >> 0     & xOnes(21);
-    return LA_Instruction            {cpu.registerMap[r_src_identifier], label};
+    return LA_Result            {cpu.registerMap[r_src_identifier], label};
 }
 
-LB_Instruction BinaryParser::PARSE_LB(const int32_t instruction, MIPSCPU& cpu)
+LB_Result BinaryParser::PARSE_LB(const int32_t instruction, MIPSCPU& cpu)
 {
     const int32_t r_dest_identifier   = instruction >> 21    & xOnes(REGISTER_BITS);
     const int32_t r_src_identifier    = instruction >> 16    & xOnes(REGISTER_BITS);
     const int32_t offset              = instruction >> 0     & xOnes(OFFSET_BITS);
-    return LB_Instruction             {cpu.registerMap[r_dest_identifier], cpu.registerMap[r_src_identifier], offset};
+    return LB_Result             {cpu.registerMap[r_dest_identifier], cpu.registerMap[r_src_identifier], offset};
 }
 
-LI_Instruction BinaryParser::PARSE_LI(const int32_t instruction, MIPSCPU& cpu)
+LI_Result BinaryParser::PARSE_LI(const int32_t instruction, MIPSCPU& cpu)
 {
     const int32_t r_dest_identifier   = instruction >> 21    & xOnes(REGISTER_BITS);
     const int32_t imm                 = instruction >> 0     & xOnes(IMMEDIATE_BITS);
-    return LI_Instruction             {cpu.registerMap[r_dest_identifier], imm};
+    return LI_Result             {cpu.registerMap[r_dest_identifier], imm};
 }
 
-SUBI_Instruction BinaryParser::PARSE_SUBI(const int32_t instruction, MIPSCPU& cpu)
+SUBI_Result BinaryParser::PARSE_SUBI(const int32_t instruction, MIPSCPU& cpu)
 {
     const int32_t r_dest_identifier   = instruction >> 21    & xOnes(REGISTER_BITS);
     const int32_t r_src_identifier    = instruction >> 16    & xOnes(REGISTER_BITS);
     const int32_t imm                 = instruction >> 0     & xOnes(IMMEDIATE_BITS);
-    return SUBI_Instruction           {cpu.registerMap[r_dest_identifier], cpu.registerMap[r_src_identifier], imm};
+    return SUBI_Result           {cpu.registerMap[r_dest_identifier], cpu.registerMap[r_src_identifier], imm};
 }

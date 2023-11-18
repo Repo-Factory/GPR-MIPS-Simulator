@@ -34,28 +34,28 @@ int32_t* ABSOLUTE_BASE_ADDRESS(MIPSCPU& cpu)
     return cpu.BASE;           
 }
 
-EX_Result ADDI(const ADDI_Instruction addi_instruction)
+EX_Result ADDI(const ADDI_Result addi_instruction)
 {
     return EX_Result{MIPS_TYPE::RType, addi_instruction.Rdest, *addi_instruction.Rsrc1 + addi_instruction.Imm};
 }
 
 // For branch instructions we can move the PC by the offset indicated in the label
-EX_Result B(const B_Instruction b_instruction, MIPSCPU cpu)
+EX_Result B(const B_Result b_instruction, MIPSCPU cpu)
 {
     return EX_Result{MIPS_TYPE::JType, NULL, 0};
 }
 
-EX_Result BEQZ(const BEQZ_Instruction beqz_instruction, MIPSCPU cpu)
+EX_Result BEQZ(const BEQZ_Result beqz_instruction, MIPSCPU cpu)
 {
     return EX_Result{MIPS_TYPE::JType, NULL, 0};
 }
 
-EX_Result BGE(const BGE_Instruction bge_instruction, MIPSCPU cpu)
+EX_Result BGE(const BGE_Result bge_instruction, MIPSCPU cpu)
 {
     return EX_Result{MIPS_TYPE::JType, NULL, 0};
 }
 
-EX_Result BNE(const BNE_Instruction bne_instruction, MIPSCPU cpu)
+EX_Result BNE(const BNE_Result bne_instruction, MIPSCPU cpu)
 {
     return EX_Result{MIPS_TYPE::JType, NULL, 0};
 }
@@ -65,7 +65,7 @@ EX_Result BNE(const BNE_Instruction bne_instruction, MIPSCPU cpu)
 // jump from an absolute reference point. However, we don't explicitly know how far the target is from the absolute base address.
 // We do know how far it is from the PC. So we can find how far the pc is from the base address, add that to how far the address
 // is from the PC (stored in the label), and we will have the distance from the absolute base address stored in the register
-EX_Result LA(const LA_Instruction la_instruction, MIPSCPU cpu)  // Address is stored as offset from base
+EX_Result LA(const LA_Result la_instruction, MIPSCPU cpu)  // Address is stored as offset from base
 {    
     const long offsetBetweenPcAndBase = cpu.pc - ABSOLUTE_BASE_ADDRESS(cpu);
     const int32_t pcRelativeLabelOffset = ACCOUNT_FOR_INCREMENTED_PC(la_instruction.label);
@@ -74,7 +74,7 @@ EX_Result LA(const LA_Instruction la_instruction, MIPSCPU cpu)  // Address is st
 }   // Use Fixed Address &cpu.memory to convert to absolute address.
 
 // Here we want to dereference a byte of data that is found out a certain distance from the source register.
-EX_Result LB(const LB_Instruction lb_instruction, MIPSCPU cpu)
+EX_Result LB(const LB_Result lb_instruction, MIPSCPU cpu)
 {
     const int32_t* offsetAddress = lb_instruction.Rsrc1 + lb_instruction.offset;
     const long offsetAddressContents = *offsetAddress;
@@ -83,12 +83,12 @@ EX_Result LB(const LB_Instruction lb_instruction, MIPSCPU cpu)
     return EX_Result{MIPS_TYPE::IType, lb_instruction.Rdest, byteAddressContents}; //
 }   // Dereferencing char pointer gives us a byte
 
-EX_Result LI(const LI_Instruction li_instruction)
+EX_Result LI(const LI_Result li_instruction)
 {
     return EX_Result{MIPS_TYPE::IType, li_instruction.Rdest, li_instruction.Imm};
 }
 
-EX_Result SUBI(const SUBI_Instruction subi_instruction)
+EX_Result SUBI(const SUBI_Result subi_instruction)
 {
     return EX_Result{MIPS_TYPE::RType, subi_instruction.Rdest, *subi_instruction.Rsrc1 - subi_instruction.Imm};
 }

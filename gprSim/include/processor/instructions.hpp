@@ -42,76 +42,62 @@ enum class Instruction               // OpCode Mappings
     SYSCALL                         = 10
 };
 
-struct ADDI_Instruction
+struct ADDI_Result
 {
     int32_t* Rdest;
     int32_t* Rsrc1;
     int32_t Imm;
 };
 
-struct B_Instruction
+struct B_Result
 {
     int32_t label;
 };
 
-struct BEQZ_Instruction
-{
-    int32_t* Rsrc1;
-    int32_t label;
-};
-
-struct BGE_Instruction
+struct BEQZ_Result
 {
     int32_t* Rsrc1;
-    int32_t* Rsrc2;
     int32_t label;
 };
 
-struct BNE_Instruction
+struct BGE_Result
 {
     int32_t* Rsrc1;
     int32_t* Rsrc2;
     int32_t label;
 };
 
-struct LA_Instruction
+struct BNE_Result
+{
+    int32_t* Rsrc1;
+    int32_t* Rsrc2;
+    int32_t label;
+};
+
+struct LA_Result
 {
     int32_t* Rdest;
     int32_t label;
 };
 
-struct LB_Instruction
+struct LB_Result
 {
     int32_t* Rdest;
     int32_t* Rsrc1;
     int32_t offset;
 };
 
-struct LI_Instruction
+struct LI_Result
 {
     int32_t* Rdest;
     int32_t Imm;
 };
 
-struct SUBI_Instruction
+struct SUBI_Result
 {
     int32_t* Rdest;
     int32_t* Rsrc1;
     int32_t Imm;
-};
-
-
-struct EX_Result
-{
-    MIPS_TYPE type;
-    int32_t* destination;
-    long result;
-};
-
-struct MEM_Result
-{
-    int32_t* destination;
-    long result;
 };
 
 constexpr int32_t NOP_OPCODE()
